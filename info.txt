@@ -1,3 +1,11 @@
+Run Yolo
+
+cd spyproj
+cd yolov7
+python detect.py --weights yolov7.pt --conf 0.25 --img-size 640 --source 0
+
+
+
 echo "# AI" >> README.md
 git init
 git add README.md
