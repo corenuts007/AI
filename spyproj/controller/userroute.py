@@ -24,16 +24,24 @@ def users():
             userlist = list(usercursor)
             print("**aaa***abcd*", userlist)
             users = []
-            password = None
+           
             for user in userlist:
+                password = ''
+                location = ''
                 id = user['_id']
                 username = user['username']
                 # if password is None:
-                password = user['password']
+                if 'password' in user:
+                    password = user['password']
+                
+                if 'location' in user:
+                    location = user['location']
+
                 dataDict = {
                     'id': str(id),
                     'username': username,
-                    'password': password
+                    'password': password,
+                    'location': location
                 }
                 users.append(dataDict)
             # convert into json
@@ -51,7 +59,7 @@ def users():
 
 
 @app.route('/userByName', methods=['GET'])
-def userByName():
+def getUserByName():
     try:
 
         # Request from front end as json object
@@ -88,16 +96,89 @@ def userByName():
 def createuser():
     try:
         print('hi')
+
+        newDataReq = request.json["newData"]
+
+        # pass the primary key as filter in order to update document based on it
+        usercursor = UserDetails.get_userbyid({'username':newDataReq["username"] })
+
+        # if already user is exist then skip the create user
+        userlist = list(usercursor)
+        if len(userlist) != 0:
+            return Response(response="User already exist, please try again", status=200, mimetype="application/json")
+
+        # if user not exist then create it
         data = UserDetailsData.user_data(request)
         print("data :", data)
-        # userdata = {'username':request.json["username"], 'password':request.json["password"]}
-        # print(userdata)
         UserDetails.create_user(data)
         return Response(response="User created successfully", status=200, mimetype="application/json")
     except Exception as ex:
         print("*Exception*")
         print(ex.__str__())
         return Response(response="Failure", status=500, mimetype="application/json")
+
+
+@app.route('/updateUserByName', methods=['GET','POST'])
+def updateUserByName():
+    try:
+
+        updateDataReq = request.json["updateData"]
+
+        # pass the primary key as filter in order to update document based on it
+        usercursor = UserDetails.get_userbyid({'username':updateDataReq["username"] })
+
+        # if  user is not exist then skip the update user
+        userlist = list(usercursor)
+        if len(userlist) == 0:
+            return Response(response="User not exist, please try again", status=200, mimetype="application/json")
+
+
+        # pass the primary key as filter in order to update document based on it
+        filter = { 'username': updateDataReq["username"] }
+        print(filter)
+
+        # set what are the values need to update in document
+        dataForUpdate = UserDetailsData.user_UpdateData(request)
+        print("data :", dataForUpdate)
+        updatedData = { "$set": dataForUpdate }
+        UserDetails.update_user(filter, updatedData)
+
+        print("*** After Update  *")
+        return Response(response="Updated suceessfully", status=200, mimetype="application/json")
+
+    except Exception as ex:
+        print("*Exception*")
+        print(ex.__str__())
+        return Response(response="Update is Failed", status=500, mimetype="application/json")
+
+
+@app.route('/deleteUserByName', methods=['GET','POST'])
+def deleteUserByName():
+    try:
+
+        print(request.json["username"])
+        # find method returns cursor object
+        usercursor = UserDetails.get_userbyid({'username':request.json["username"]})
+
+        # if  user is not exist then skip the delete user
+        userlist = list(usercursor)
+        if len(userlist) == 0:
+            return Response(response="User not exist, please try again", status=200, mimetype="application/json")
+        
+        
+        # pass the primary key data as filter to delete the document
+        filter = { 'username': request.json["username"] }
+        print(filter)
+        UserDetails.delete_user(filter)
+
+        print("*** After Delete  *")
+        return Response(response="Deleted suceessfully", status=200, mimetype="application/json")
+
+    except Exception as ex:
+        print("*Exception*")
+        print(ex.__str__())
+        return Response(response="Delete is Failed", status=500, mimetype="application/json")
+
 
 
 if __name__ == '__main__':
