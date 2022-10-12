@@ -16,3 +16,15 @@ class UserDetails:
         print("inside")
         db_conn.get_collection('User_Details').insert_one(data)
         print("ousdie")
+
+    def update_user(filter, updatedData):
+        db_conn = Connection.get_database()
+        print("inside - update")
+        db_conn.get_collection('User_Details').update_one(filter, updatedData)
+        print("ousdie - update")
+
+    def delete_user(filter):
+        db_conn = Connection.get_database()
+        print("inside - delete")
+        db_conn.get_collection('User_Details').delete_one(filter)
+        print("ousdie - delete")
