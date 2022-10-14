@@ -1,10 +1,8 @@
 from flask import render_template, Response, request
 from spyproj import app
-# from flask_pymongo import PyMongo
 from spyproj.repository.cameradetails_repository import CameraDetails
 from spyproj.model.camera_details_data import CameraDetailsData
 from flask import jsonify
-#from spyproj.detect import detect
 
 
 @app.route('/cameras', methods=['GET'])
