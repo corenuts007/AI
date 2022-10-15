@@ -3,7 +3,7 @@ from spyproj import app
 from spyproj.repository.cameradetails_repository import CameraDetails
 from spyproj.model.camera_details_data import CameraDetailsData
 from flask import jsonify
-from spyproj.yolov7 import detect
+import spyproj.yolov7.detect as detect
 
 
 @app.route('/cameras', methods=['GET'])
