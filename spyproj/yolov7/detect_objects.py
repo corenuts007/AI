@@ -16,6 +16,9 @@ from spyproj.yolov7.utils.plots import plot_one_box
 from spyproj.yolov7.utils.torch_utils import select_device, load_classifier, time_synchronized, TracedModel
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from spyproj.repository.alertdetails_repository import AlertDetails
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 
 class Detective:
     def detect(self):
@@ -205,6 +208,20 @@ class Detective:
                                     vid_writer = cv2.VideoWriter(
                                         save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
                                 vid_writer.write(im0)
+                                finalvalue = {}
+                                finalvalue['org_name'] = 'sbr'
+                                finalvalue['camera_name'] = 'cam01'
+                                finalvalue['camera_location'] = 'horizon'
+                                finalvalue['alert_time'] = currentTime
+                                finalvalue['video_locaion'] = save_path
+                                alertName =finalvalue['alert_name']=finalvalue['org_name']+finalvalue['camera_name']+finalvalue['camera_location']+ finalvalue['video_locaion'] 
+                                finalvalue['alert_name']=alertName
+                                print(alertName)
+                                alertCursor = AlertDetails.get_alertbyid({'alert_name': alertName})
+                                alertlist = list(alertCursor)
+                                if len(alertlist) == 0:
+                                    print("insert db=",alertName)
+                                    AlertDetails.create_alert(finalvalue)
                                 
 
         if save_txt or save_img:
