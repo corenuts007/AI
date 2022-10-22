@@ -30,3 +30,8 @@ class CameraDetails:
         print("inside - delete")
         db_conn.get_collection('Camera_Details').delete_one(filter)
         print("ousdie - delete")
+    
+    def get_camera_details_bystatus(status):
+        db_conn = Connection.get_database()
+        cameradatalist = db_conn.get_collection('Camera_Details').find(status)
+        return cameradatalist

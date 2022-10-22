@@ -140,7 +140,7 @@ def updateCameraByName():
         print("====filter====>", filter)
 
         # set what are the values need to update in document
-        dataForUpdate = CameraDetailsData.camera_UpdateData(request)
+        dataForUpdate = CameraDetailsData.camera_updateData(request)
         print("data :", dataForUpdate)
         updatedData = {"$set": dataForUpdate}
         CameraDetails.update_camera(filter, updatedData)
