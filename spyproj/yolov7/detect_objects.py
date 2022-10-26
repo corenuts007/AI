@@ -7,6 +7,7 @@ import cv2
 import torch
 import torch.backends.cudnn as cudnn
 from numpy import random
+from threading import Thread
 
 from spyproj.yolov7.models.experimental import attempt_load
 from spyproj.yolov7.utils.datasets import LoadStreams, LoadImages
@@ -20,11 +21,14 @@ from spyproj.repository.alertdetails_repository import AlertDetails
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
-class Detective:
+class Detective():
+    
     def detect(self):
         source, weights, view_img, save_txt, imgsz, trace = self.opt.source, self.opt.weights, self.opt.view_img, self.opt.save_txt, self.opt.img_size, not self.opt.no_trace
         save_img = not self.opt.nosave and not source.endswith(
             '.txt')  # save inference images
+        process_endtime = self.process_endtime
+        print('process_endtime:', process_endtime)
         webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
             ('rtsp://', 'rtmp://', 'http://', 'https://'))
         previousTime=currentTime = datetime.now()
@@ -79,7 +83,9 @@ class Detective:
         old_img_b = 1
 
         t0 = time.time()
+        countValue = 0
         for path, img, im0s, vid_cap in dataset:
+            countValue = countValue + 1
             img = torch.from_numpy(img).to(device)
             img = img.half() if half else img.float()  # uint8 to fp16/32
             img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -222,13 +228,25 @@ class Detective:
                                 if len(alertlist) == 0:
                                     print("insert db=",alertName)
                                     AlertDetails.create_alert(finalvalue)
-                                
 
+            print('datetime.now():', datetime.now())
+            print('process_endtime:', process_endtime)
+            print('countValue:', countValue)
+            # FIXME, have to remove the countValue condition
+            if(datetime.now() >= process_endtime or countValue > 100):
+                print('Path name:', p)
+                print('P name:', p.name)
+                cv2.destroyWindow(str(p))
+                break
+            else:
+                print('Still condition not satisfy')
+                                
         if save_txt or save_img:
             s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
             ##print(f"Results saved to {save_dir}{s}")
 
         #print(f'Done. ({time.time() - t0:.3f}s)')
+        
 
 
     def __init__(self):
@@ -264,13 +282,16 @@ class Detective:
         #     else:
         #         detect()
 
-    def detect_object_method(self):
+    def detect_process(self, url, process_endtime):
         print('detect_object_method')
         #for self.self.opt.weights in ['yolov7.pt']:
         self.opt.weights = 'spyproj\yolov7\yolov7.pt'
         self.opt.img_size = 640
+        #self.opt.source = 'https://www.youtube.com/watch?v=BTFWu21-arc'
         #self.opt.source = '0'
+        self.opt.source = url
         self.opt.conf = 0.25
         self.opt.save_img = False
+        self.process_endtime = process_endtime
         self.detect()
         strip_optimizer(self.opt.weights)
