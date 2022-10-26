@@ -20,7 +20,8 @@ from dateutil.relativedelta import relativedelta
 from spyproj.repository.alertdetails_repository import AlertDetails
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-
+import os.path
+from spyproj.yolov7.utils.googleDriveUpload import googleDriveUpload
 class Detective():
     
     def detect(self):
@@ -32,6 +33,8 @@ class Detective():
         webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
             ('rtsp://', 'rtmp://', 'http://', 'https://'))
         previousTime=currentTime = datetime.now()
+        uploadVideo =False
+        
         # Directories
         save_dir = Path(increment_path(Path(self.opt.project) / self.opt.name,
                         exist_ok=self.opt.exist_ok))  # increment run
@@ -134,29 +137,39 @@ class Detective():
                 
                 diff = relativedelta(currentTime, previousTime)
                 #first time
+                isReadyToUpload = False
+                previousVideoPath= 'abc'
+                img3=''
                 print("current_time===============================>",currentTime)
                 print("previousTime===============================>",previousTime)
                 print("diff===============================>",diff.minutes)
-                #print("timeeeeeeeeeeeeeeeeeeeeeeeeeeee", diff.minutes)
-                if(diff.minutes>1):
+                if(diff.minutes>2):
                     imgName1=currentTime.strftime("%H_%M")+p.name
+                    isReadyToUpload=True
+                    img3=previousTime.strftime("%H_%M")+p.name+'.mp4'
+                    #print('1',img3)
+                    previousVideoPath=str(save_dir / img3)
+                    #print('2',previousVideoPath)
                     previousTime= currentTime
+                    #previousVideoPath+='.mp4'
+                    #print('3',previousVideoPath)
                 else:
                     imgName1=previousTime.strftime("%H_%M")+p.name
+                    isReadyToUpload = False
                 
                 print("imgName1===============================>",imgName1)
                 save_path = str(save_dir /imgName1)  # img.jpg
-                txt_path = str(save_dir / 'labels' / p.stem) + \
+                print("save_path===============================>",save_path)                txt_path = str(save_dir / 'labels' / p.stem) + \
                     ('' if dataset.mode == 'image' else f'_{frame}')  # img.txt
                 # normalization gain whwhpreviousTime
                 gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]
                 personDetected =False
                 if len(det):
-                    for c in det[:, -1].unique():
-                        if(names[int(c)]=='person'):
-                            personDetected=True
-                            #print("person detected")
-                if (personDetected):
+                        for c in det[:, -1].unique():
+                            if(names[int(c)]=='person'):
+                                personDetected=True
+                                #print("person detected")
+                if (True):
                         # Rescale boxes from img_size to im0 size
                         det[:, :4] = scale_coords(
                             img.shape[2:], det[:, :4], im0.shape).round()
@@ -210,25 +223,34 @@ class Detective():
                                         h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                                     else:  # stream
                                         fps, w, h = 30, im0.shape[1], im0.shape[0]
-                                        save_path += '.avi'
+                                        save_path += '.mp4'
                                     vid_writer = cv2.VideoWriter(
                                         save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
                                 vid_writer.write(im0)
-                                finalvalue = {}
-                                finalvalue['org_name'] = 'sbr'
-                                finalvalue['camera_name'] = 'cam01'
-                                finalvalue['camera_location'] = 'horizon'
-                                finalvalue['alert_time'] = currentTime
-                                finalvalue['video_locaion'] = save_path
-                                alertName =finalvalue['alert_name']=finalvalue['org_name']+finalvalue['camera_name']+finalvalue['camera_location']+ finalvalue['video_locaion'] 
-                                finalvalue['alert_name']=alertName
-                                print(alertName)
-                                alertCursor = AlertDetails.get_alertbyid({'alert_name': alertName})
-                                alertlist = list(alertCursor)
-                                if len(alertlist) == 0:
-                                    print("insert db=",alertName)
-                                    AlertDetails.create_alert(finalvalue)
-
+                                if(personDetected and not isReadyToUpload):
+                                    uploadVideo =True
+                                
+                                if(isReadyToUpload and uploadVideo):
+                                    uploadVideo=False
+                                ##google
+                                    print("previousVideoPath*****===>",previousVideoPath) 
+                                    gdriveLink = googleDriveUpload()
+                                    gLink=gdriveLink.upload(previousVideoPath,imgName1)
+                                    #upload(previousVideoPath)
+                                    finalvalue = {}
+                                    finalvalue['org_name'] = 'sbr'
+                                    finalvalue['camera_name'] = 'cam01'
+                                    finalvalue['camera_location'] = 'horizon'
+                                    finalvalue['alert_time'] = currentTime
+                                    finalvalue['video_locaion'] = str(gLink)
+                                    alertName =finalvalue['alert_name']=finalvalue['org_name']+finalvalue['camera_name']+finalvalue['camera_location']+ finalvalue['video_locaion'] 
+                                    finalvalue['alert_name']=alertName
+                                    alertCursor = AlertDetails.get_alertbyid({'alert_name': alertName})
+                                    alertlist = list(alertCursor)
+                                    if len(alertlist) == 0:
+                                        print("insert db=",alertName )
+                                        AlertDetails.create_alert(finalvalue)
+                                        print('DB completedddd')
             print('datetime.now():', datetime.now())
             print('process_endtime:', process_endtime)
             print('countValue:', countValue)
