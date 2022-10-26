@@ -159,7 +159,8 @@ class Detective():
                 
                 print("imgName1===============================>",imgName1)
                 save_path = str(save_dir /imgName1)  # img.jpg
-                print("save_path===============================>",save_path)                txt_path = str(save_dir / 'labels' / p.stem) + \
+                print("save_path===============================>",save_path)
+                txt_path = str(save_dir / 'labels' / p.stem) + \
                     ('' if dataset.mode == 'image' else f'_{frame}')  # img.txt
                 # normalization gain whwhpreviousTime
                 gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]
