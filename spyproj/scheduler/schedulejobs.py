@@ -6,3 +6,4 @@ class Schedule_jobs:
         print('welcome schedulerTasks')
         detect = Detect_Service()
         detect.run_detect_process()
+        return

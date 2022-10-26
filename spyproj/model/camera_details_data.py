@@ -94,3 +94,18 @@ class CameraDetailsData:
         
         print(finalvalue)
         return finalvalue
+
+    def populate_filter(group_name, building_name, cam_name, status):
+ 
+        # finalvalue = {'cameraname':cameraname, 'password':password}
+        # the above statement treat as String... but we should pass as dict..
+        # so follow the below conversion before inserting record in DB
+
+        finalvalue = {}
+        finalvalue['group_name'] = group_name
+        finalvalue['building_name'] = building_name
+        finalvalue['cam_name'] = cam_name
+        finalvalue['run_status'] = status
+        print(finalvalue)
+        return finalvalue
+

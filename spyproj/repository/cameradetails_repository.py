@@ -35,3 +35,8 @@ class CameraDetails:
         db_conn = Connection.get_database()
         cameradatalist = db_conn.get_collection('Camera_Details').find(status)
         return cameradatalist
+    
+    def find_camera_details_by_params(filter):
+        db_conn = Connection.get_database()
+        cameradatalist = db_conn.get_collection('Camera_Details').find(filter)
+        return cameradatalist
