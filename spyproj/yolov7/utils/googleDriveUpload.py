@@ -22,11 +22,13 @@ class googleDriveUpload:
     def upload(self,video, imgName):
         try:
             #service = build('drive', 'v3', credentials=creds)
-            service=self.aut();
+            print("google drive auth Started")
+            service=self.aut()
+            print("google drive auth completed")
             currentDay = datetime.today().date()
              #createRemoteFolder
             parentID= self.createRemoteFolder(str(currentDay))
-            imgName += '.mp4'
+            #imgName += '.mp4'
             file_metadata = {'name': imgName, 
             'parents': [parentID],
              'type': 'anyone',
@@ -36,7 +38,7 @@ class googleDriveUpload:
             #media = MediaFileUpload('C:/Users/server/Desktop/yoylo7/runs/detect/exp2/12_580.mp4',
             #mimetype='video/mp4')
             print("*************ggg====>",video)
-            media = MediaFileUpload(video, mimetype='video/mp4')
+            media = MediaFileUpload(video, mimetype='video/webm')
             print("*************1111111====>",video)
             file = service.files().create(body=file_metadata,
                                     media_body=media,
@@ -55,18 +57,17 @@ class googleDriveUpload:
         # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        print("========>",os.path)
+        print("token exists?========>",os.path.exists('token.json'))
         if os.path.exists('token.json'):
             creds = Credentials.from_authorized_user_file('token.json', SCOPES)
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
-            #print("nooooo 1t if")
+            print("cred not valied 1t if")
             if creds and creds.expired and creds.refresh_token:
-                #print("nooooo 2nddd if")
+                print("going to refresh (cred expired) 2nd if")
                 creds.refresh(Request())
             else:
-                #print("else else else")
-                
+                print("cred not expired")
                 flow = InstalledAppFlow.from_client_secrets_file(
                     'credentials1.json', SCOPES)
                 #print("else 1111111111111111")

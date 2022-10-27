@@ -143,10 +143,10 @@ class Detective():
                 print("current_time===============================>",currentTime)
                 print("previousTime===============================>",previousTime)
                 print("diff===============================>",diff.minutes)
-                if(diff.minutes>2):
+                if(diff.minutes>6):
                     imgName1=currentTime.strftime("%H_%M")+p.name
                     isReadyToUpload=True
-                    img3=previousTime.strftime("%H_%M")+p.name+'.mp4'
+                    img3=previousTime.strftime("%H_%M")+p.name+'.webm'
                     #print('1',img3)
                     previousVideoPath=str(save_dir / img3)
                     #print('2',previousVideoPath)
@@ -157,9 +157,9 @@ class Detective():
                     imgName1=previousTime.strftime("%H_%M")+p.name
                     isReadyToUpload = False
                 
-                print("imgName1===============================>",imgName1)
+                #print("imgName1===============================>",imgName1)
                 save_path = str(save_dir /imgName1)  # img.jpg
-                print("save_path===============================>",save_path)
+                #print("save_path===============================>",save_path)
                 txt_path = str(save_dir / 'labels' / p.stem) + \
                     ('' if dataset.mode == 'image' else f'_{frame}')  # img.txt
                 # normalization gain whwhpreviousTime
@@ -224,10 +224,13 @@ class Detective():
                                         h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                                     else:  # stream
                                         fps, w, h = 30, im0.shape[1], im0.shape[0]
-                                        save_path += '.mp4'
+                                        save_path += '.webm'
                                     vid_writer = cv2.VideoWriter(
-                                        save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
+                                        save_path, cv2.VideoWriter_fourcc(*'vp80'), fps, (w, h))
                                 vid_writer.write(im0)
+                                print("isReadyToUpload===>",isReadyToUpload)
+                                print("uploadVideo===>",uploadVideo)
+                                print("isReadyToUpload && uploadVideo =",isReadyToUpload and uploadVideo)
                                 if(personDetected and not isReadyToUpload):
                                     uploadVideo =True
                                 
@@ -236,7 +239,7 @@ class Detective():
                                 ##google
                                     print("previousVideoPath*****===>",previousVideoPath) 
                                     gdriveLink = googleDriveUpload()
-                                    gLink=gdriveLink.upload(previousVideoPath,imgName1)
+                                    gLink=gdriveLink.upload(previousVideoPath,img3)
                                     #upload(previousVideoPath)
                                     finalvalue = {}
                                     finalvalue['org_name'] = 'sbr'
