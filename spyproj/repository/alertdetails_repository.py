@@ -30,3 +30,8 @@ class AlertDetails:
         print("inside - delete")
         db_conn.get_collection('Alert_Details').delete_one(filter)
         print("ousdie - delete")
+    
+    def find_alert_details_by_status(status_filter):
+        db_conn = Connection.get_database()
+        alertdatalist = db_conn.get_collection('Alert_Details').find(status_filter)
+        return alertdatalist

@@ -14,6 +14,10 @@ class AlertDetailsData:
         if ("org_name" in newdata):
             org_name = newdata["org_name"]
             finalvalue['org_name'] = org_name
+        
+        if ("camera_name" in newdata):
+            camera_name = newdata["camera_name"]
+            finalvalue['camera_name'] = camera_name
 
         if ("camera_name" in newdata):
             camera_name = newdata["camera_name"]
@@ -30,6 +34,18 @@ class AlertDetailsData:
         if ("video_locaion" in newdata):
             video_locaion = newdata["video_locaion"]
             finalvalue['video_locaion'] = video_locaion
+        
+        if ("status" in newdata):
+            status = newdata["status"]
+            finalvalue['status'] = status
+        
+        if ("message_status" in newdata):
+            message_status = newdata["message_status"]
+            finalvalue['message_status'] = message_status
+
+        if ("notification_link_status" in newdata):
+            notification_link_status = newdata["notification_link_status"]
+            finalvalue['notification_link_status'] = notification_link_status
 
         print(finalvalue)
         return finalvalue
