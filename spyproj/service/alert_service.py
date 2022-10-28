@@ -10,7 +10,7 @@ class Alert_Service:
     def alert_message_process(self):
         try:
             # find method returns cursor object
-            print('Method entry: Alert Message')
+            print('Method entry: Alert_Service - alert_message_process')
             alertcursor = AlertDetails.find_alert_details_by_status({'status':'inprogress', 'message_status':'not send'})
             alertlist = list(alertcursor)
             print('No of records in ALERT message:', len(alertlist))
@@ -29,7 +29,7 @@ class Alert_Service:
 
                 # Update Alert table with Message status as 'Sent'
                 self.__update_alert_message_status(alert_data)
-            print('Method Exit: Alert Message')
+            print('Method Exit: Alert_Service - alert_message_process')
             return
  
         except Exception as ex:
@@ -38,7 +38,7 @@ class Alert_Service:
 
 
     def alert_notification_process(self):
-        print('Method entry: Alert Notification')
+        print('Method Entry: Alert_Service - alert_notification_process')
         try:
             # find method returns cursor object
             
@@ -59,7 +59,7 @@ class Alert_Service:
 
                 # Update Alert table with notification status as 'Sent'
                 self.__update_alert_notification_status(alert_data)
-            print('Method Exit: Alert Notification')
+            print('Method Exit: Alert_Service - alert_notification_process')
             return
  
         except Exception as ex:
@@ -70,7 +70,7 @@ class Alert_Service:
 
     def __update_alert_message_status(self, alert_data):
         try:
-            print('Method Entry: __update_alert_message_status')
+            print('Method Entry: Alert_Service - __update_alert_message_status')
 
             alert_data['message_status'] = 'sent'
             #print('Update:', update_data)
@@ -81,7 +81,7 @@ class Alert_Service:
             #print('update_data Id:', update_data)
             AlertDetails.update_alert(filter_id, update_data)
             #return cameralist
-            print('Method Exit: __update_alert_message_status')
+            print('Method Exit: Alert_Service - __update_alert_message_status')
             return
         except Exception as ex:
             print("*Exception*", ex)
@@ -89,7 +89,7 @@ class Alert_Service:
 
     def __update_alert_notification_status(self, alert_data):
         try:
-            print('Method Entry: __update_alert_notification_status')
+            print('Method Entry: Alert_Service - __update_alert_notification_status')
 
             alert_data['notification_link_status'] = 'sent'
             #print('Update:', update_data)
@@ -99,7 +99,7 @@ class Alert_Service:
             update_data = {"$set": alert_data}
             #print('update_data Id:', update_data)
             AlertDetails.update_alert(filter_id, update_data)
-            print('Method Exit: __update_alert_notification_status')
+            print('Method Exit: Alert_Service - __update_alert_notification_status')
             return
         except Exception as ex:
             print("*Exception*", ex)
