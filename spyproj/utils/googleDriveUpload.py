@@ -12,12 +12,15 @@ from datetime import datetime
 # If modifying these scopes, delete the file token.json.
 #SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
 #SCOPES = ['https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable']
-SCOPES = ['https://www.googleapis.com/auth/drive']
+SCOPES = ['https://www.googleapis.com/auth/gmail.modify',
+        'https://www.googleapis.com/auth/gmail.settings.basic',
+        'https://www.googleapis.com/auth/drive'
+]
 
 class googleDriveUpload:
 
     def __init__(self):
-        print('hi')
+        print('in googleDriveUpload ****googleDriveUpload****************')
 
     def upload(self,video, imgName):
         try:
@@ -69,7 +72,7 @@ class googleDriveUpload:
             else:
                 print("cred not expired")
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials1.json', SCOPES)
+                    'client_secret.json', SCOPES)
                 #print("else 1111111111111111")
                 flow.redirect_uri = 'http://localhost:5001/'
 

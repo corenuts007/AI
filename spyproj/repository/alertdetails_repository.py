@@ -31,7 +31,7 @@ class AlertDetails:
         db_conn.get_collection('Alert_Details').delete_one(filter)
         print("ousdie - delete")
     
-    def find_alert_details_by_status(status_filter):
+    def find_alert_details_by_filterCondition(filter):
         db_conn = Connection.get_database()
-        alertdatalist = db_conn.get_collection('Alert_Details').find(status_filter)
+        alertdatalist = db_conn.get_collection('Alert_Details').find(filter)
         return alertdatalist

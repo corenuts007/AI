@@ -50,7 +50,9 @@ class Gmail(object):
     # Allow Gmail to read and write emails, and access settings like aliases.
     _SCOPES = [
         'https://www.googleapis.com/auth/gmail.modify',
-        'https://www.googleapis.com/auth/gmail.settings.basic'
+        'https://www.googleapis.com/auth/gmail.settings.basic',
+        'https://www.googleapis.com/auth/drive'
+
     ]
 
     # If you don't have a client secret file, follow the instructions at:
@@ -70,6 +72,7 @@ class Gmail(object):
             # The file token.json stores the user's access and refresh
             # tokens, and is created automatically when the authorization flow
             # completes for the first time.
+            print("GMAIL  GMAIL  GMAIL")
             if _creds:
                 self.creds = _creds
             else:

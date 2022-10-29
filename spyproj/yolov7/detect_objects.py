@@ -140,10 +140,10 @@ class Detective():
                 isReadyToUpload = False
                 previousVideoPath= 'abc'
                 img3=''
-                print("current_time===============================>",currentTime)
-                print("previousTime===============================>",previousTime)
+                #print("current_time===============================>",currentTime)
+                #print("previousTime===============================>",previousTime)
                 print("diff===============================>",diff.minutes)
-                if(diff.minutes>0):
+                if(diff.minutes>1):
                     imgName1=currentTime.strftime("%H_%M")+p.name
                     isReadyToUpload=True
                     img3=previousTime.strftime("%H_%M")+p.name+'.webm'
@@ -169,6 +169,7 @@ class Detective():
                         for c in det[:, -1].unique():
                             if(names[int(c)]=='person'):
                                 personDetected=True
+                                self.insertAlertDetailsIntoDB(self.group_name,self.cam_name,self.building_name,save_path,self.email_address,self.phone_numbers)
                                 #print("person detected")
                 if (True):
                         # Rescale boxes from img_size to im0 size
@@ -230,31 +231,18 @@ class Detective():
                                 vid_writer.write(im0)
                                 print("isReadyToUpload===>",isReadyToUpload)
                                 print("uploadVideo===>",uploadVideo)
-                                print("isReadyToUpload && uploadVideo =",isReadyToUpload and uploadVideo)
+                                print("**************************isReadyToUpload && uploadVideo =",isReadyToUpload and uploadVideo)
                                 if(personDetected and not isReadyToUpload):
                                     uploadVideo =True
                                 
                                 if(isReadyToUpload and uploadVideo):
                                     uploadVideo=False
                                 ##google
-                                    print("previousVideoPath*****===>",previousVideoPath) 
-                                    gdriveLink = googleDriveUpload()
-                                    gLink=gdriveLink.upload(previousVideoPath,img3)
+                                    #print("previousVideoPath*****===>",previousVideoPath) 
+                                    #gdriveLink = googleDriveUpload()
+                                    #gLink=gdriveLink.upload(previousVideoPath,img3)
                                     #upload(previousVideoPath)
-                                    finalvalue = {}
-                                    finalvalue['org_name'] = 'sbr'
-                                    finalvalue['camera_name'] = 'cam01'
-                                    finalvalue['camera_location'] = 'horizon'
-                                    finalvalue['alert_time'] = currentTime
-                                    finalvalue['video_locaion'] = str(gLink)
-                                    alertName =finalvalue['alert_name']=finalvalue['org_name']+finalvalue['camera_name']+finalvalue['camera_location']+ finalvalue['video_locaion'] 
-                                    finalvalue['alert_name']=alertName
-                                    alertCursor = AlertDetails.get_alertbyid({'alert_name': alertName})
-                                    alertlist = list(alertCursor)
-                                    if len(alertlist) == 0:
-                                        print("insert db=",alertName )
-                                        AlertDetails.create_alert(finalvalue)
-                                        print('DB completedddd')
+                                    self.UpdateAlertDetailsIntoDB(self.group_name,self.cam_name,self.building_name,previousVideoPath)
             print('datetime.now():', datetime.now())
             print('process_endtime:', process_endtime)
             print('countValue:', countValue)
@@ -273,6 +261,44 @@ class Detective():
 
         #print(f'Done. ({time.time() - t0:.3f}s)')
         
+    def insertAlertDetailsIntoDB(self, group_name,cam_name,building_name,save_path,email_address,phone_numbers) :
+            print("person detected -- Insert cam info into db")
+            alertData = {}
+            alertData['org_name'] = group_name
+            alertData['camera_name'] = cam_name
+            alertData['camera_location'] = building_name
+            alertData['alert_time'] = datetime.now()
+            #save_path=save_path.replace("\\","abcd")
+            alertData['video_location'] = save_path
+            alertName =alertData['alert_name']=alertData['org_name']+alertData['camera_name']+alertData['camera_location']+ alertData['video_locaion']+'.webm' 
+            alertData['alert_name']=alertName
+            alertData['status']='inprogress'
+            alertData['email_address']=email_address
+            alertData['phone_numbers']=phone_numbers
+            alertData['message_status']='not send'
+            alertData['notification_link_status']='not send'
+            alertcursor = AlertDetails.find_alert_details_by_filterCondition({'alert_name': alertName})
+            alertlist = list(alertcursor)
+            if len(alertlist) == 0:
+                print("insert db=",alertData )
+                AlertDetails.create_alert(alertData)
+                print('Insert DB completedddd',alertData)
+    
+    def UpdateAlertDetailsIntoDB(self, group_name,cam_name,building_name,save_path) :
+    	
+        #to get unique id
+        print("Updatting db with status==completed")
+        #save_path=save_path.replace("\\","abcd")
+        alertName =group_name+cam_name+building_name+ save_path
+        print("filter condition*******",alertName)
+        alertcursor = AlertDetails.find_alert_details_by_filterCondition({'alert_name': alertName})
+        alertlist = list(alertcursor)
+        print('No of records in UpdateAlertDetailsIntoDB Notification:', len(alertlist))
+        for alertData in alertlist:
+            alertData['status']='ready'
+            alertData = {"$set": alertData}
+            AlertDetails.update_alert({'alert_name': alertName}, alertData)
+        print('Alert Update DB completed')                   
 
 
     def __init__(self):
@@ -308,7 +334,7 @@ class Detective():
         #     else:
         #         detect()
 
-    def detect_process(self, url, process_endtime):
+    def detect_process(self, url, process_endtime,group_name,cam_name,building_name,email_address,phone_numbers):
         print('detect_object_method')
         #for self.self.opt.weights in ['yolov7.pt']:
         self.opt.weights = 'spyproj\yolov7\yolov7.pt'
@@ -319,5 +345,10 @@ class Detective():
         self.opt.conf = 0.25
         self.opt.save_img = False
         self.process_endtime = process_endtime
+        self.group_name = group_name
+        self.cam_name = cam_name
+        self.building_name = building_name
+        self.email_address = email_address
+        self.phone_numbers = phone_numbers
         self.detect()
         strip_optimizer(self.opt.weights)
