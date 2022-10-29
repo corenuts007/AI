@@ -21,3 +21,6 @@ git push -u origin main
 git remote add origin https://github.com/corenuts007/AI.git
 git branch -M main
 git push -u origin main	
+
+Create requirements command by using below
+> pip freeze >requirement.txt
