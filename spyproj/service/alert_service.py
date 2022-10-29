@@ -5,27 +5,48 @@ from spyproj import app
 from spyproj.repository.alertdetails_repository import AlertDetails
 from spyproj.model.alert_details_data import AlertDetailsData
 from bson.objectid import ObjectId
+from spyproj.utils.googleDriveUpload import googleDriveUpload
+from spyproj.utils.simplegmail.gmail import Gmail
 
 class Alert_Service:
     def alert_message_process(self):
         try:
             # find method returns cursor object
             print('Method entry: Alert_Service - alert_message_process')
-            alertcursor = AlertDetails.find_alert_details_by_status({'status':'inprogress', 'message_status':'not send'})
+            alertcursor = AlertDetails.find_alert_details_by_filterCondition({'status':'inprogress', 'message_status':'not send'})
             alertlist = list(alertcursor)
             print('No of records in ALERT message:', len(alertlist))
             for alert_data in alertlist:
                 if 'group_name' in alert_data:
                     print('group_name:', alert_data['group_name'])
                     group_name = alert_data['group_name']
-                if 'building_name' in alert_data:
-                    print('building_name:', alert_data['building_name'])
-                    building_name = alert_data['building_name']
+                if 'camera_location' in alert_data:
+                    print('camera_location:', alert_data['camera_location'])
+                    camera_location = alert_data['camera_location']
                 if 'camera_name' in alert_data:
                     print('camera_name:', alert_data['camera_name'])
                     camera_name = alert_data['camera_name']
 
+                if 'email_address' in alert_data:
+                    print('Email Address:', alert_data['email_address'])
+                    email_address = alert_data['email_address']
+                if 'phone_numbers' in alert_data:
+                    print('Phone Numbers:', alert_data['phone_numbers'])
+                    phone_numbers = alert_data['phone_numbers']
+
+
                 # Write Logic to send whatapp, email message to customer
+                gmail = Gmail()
+                params = {
+                    "to": email_address,
+                    "sender": "rajkamal.spyproject@gmail.com",
+                    "subject": "Alert - " + camera_location + " Suspicious Activity",
+                    "msg_html": "<h1>We Identified   Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.",
+                    "msg_plain": " ",
+                    "signature": True  # use my account signature
+                }
+                message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
+                print("mail...",message)
 
                 # Update Alert table with Message status as 'Sent'
                 self.__update_alert_message_status(alert_data)
@@ -42,21 +63,52 @@ class Alert_Service:
         try:
             # find method returns cursor object
             
-            alertcursor = AlertDetails.find_alert_details_by_status({'status':'ready','notification_link_status':'not send'})
+            alertcursor = AlertDetails.find_alert_details_by_filterCondition({'status':'ready','notification_link_status':'not send'})
             alertlist = list(alertcursor)
             print('No of records in ALERT Notification:', len(alertlist))
             for alert_data in alertlist:
                 if 'group_name' in alert_data:
                     print('group_name:', alert_data['group_name'])
                     group_name = alert_data['group_name']
-                if 'building_name' in alert_data:
-                    print('building_name:', alert_data['building_name'])
-                    building_name = alert_data['building_name']
+                if 'camera_location' in alert_data:
+                    print('camera_location:', alert_data['camera_location'])
+                    camera_location = alert_data['camera_location']
                 if 'camera_name' in alert_data:
                     print('camera_name:', alert_data['camera_name'])
                     camera_name = alert_data['camera_name']
-                # Write Logic to send notification link to customer
 
+                if 'email_address' in alert_data:
+                    print('Email Address:', alert_data['email_address'])
+                    email_address = alert_data['email_address']
+                if 'phone_numbers' in alert_data:
+                    print('Phone Numbers:', alert_data['phone_numbers'])
+                    phone_numbers = alert_data['phone_numbers']
+                    
+                if 'video_location' in alert_data:
+                    print('video Locaion:', alert_data['video_location'])
+                    video_location = alert_data['video_location']
+                # Add the video attachment
+                #googleDriveUpload
+                #print("Uploading video into google Drive. video_location :"+ video_location)
+                #gdriveLink = googleDriveUpload()
+                #gLink=gdriveLink.upload(video_location,"video_name1")
+            
+                #update Google drive url into alert table
+                #alert_data['status']='gLink'
+
+                # Write Logic to send whatapp, email message to customer
+                gmail = Gmail()
+                params = {
+                    "to": email_address,
+                    "sender": "rajkamal.spyproject@gmail.com",
+                    "subject": "Alert(2) - " + camera_location + " Suspicious Activity",
+                    "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.",
+                    "msg_plain": " ",
+                    "attachments": [video_location],
+                    "signature": True  # use my account signature
+                }
+                message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
+                print("upload mail...",message)
                 # Update Alert table with notification status as 'Sent'
                 self.__update_alert_notification_status(alert_data)
             print('Method Exit: Alert_Service - alert_notification_process')

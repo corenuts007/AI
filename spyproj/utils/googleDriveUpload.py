@@ -9,15 +9,18 @@ from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 from datetime import datetime
 
-# If modifying these scopes, delete the file token.json.
+# If modifying these scopes, delete the file token_gdrive.json.
 #SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
 #SCOPES = ['https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable']
-SCOPES = ['https://www.googleapis.com/auth/drive']
+SCOPES = ['https://www.googleapis.com/auth/gmail.modify',
+        'https://www.googleapis.com/auth/gmail.settings.basic',
+        'https://www.googleapis.com/auth/drive'
+]
 
 class googleDriveUpload:
 
     def __init__(self):
-        print('hi')
+        print('in googleDriveUpload ****googleDriveUpload****************')
 
     def upload(self,video, imgName):
         try:
@@ -54,12 +57,12 @@ class googleDriveUpload:
         Prints the names and ids of the first 10 files the user has access to.
         """
         creds = None
-        # The file token.json stores the user's access and refresh tokens, and is
+        # The file token_gdrive.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        print("token exists?========>",os.path.exists('token.json'))
-        if os.path.exists('token.json'):
-            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+        print("token exists?========>",os.path.exists('token_gdrive.json'))
+        if os.path.exists('token_gdrive.json'):
+            creds = Credentials.from_authorized_user_file('token_gdrive.json', SCOPES)
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
             print("cred not valied 1t if")
@@ -69,13 +72,13 @@ class googleDriveUpload:
             else:
                 print("cred not expired")
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials1.json', SCOPES)
+                    'client_secret_gdrive.json', SCOPES)
                 #print("else 1111111111111111")
                 flow.redirect_uri = 'http://localhost:5001/'
 
                 creds = flow.run_local_server(port=5001)
             # Save the credentials for the next run
-            with open('token.json', 'w') as token:
+            with open('token_gdrive.json', 'w') as token:
                 token.write(creds.to_json())
 
         try:

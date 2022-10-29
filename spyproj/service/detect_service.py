@@ -181,11 +181,18 @@ class Detect_Service:
                 if 'cam_name' in camera_data:
                     print('Cam name:', camera_data['cam_name'])
                     cam_name = camera_data['cam_name']
+                if 'email_address' in camera_data:
+                    print('Email Address:', camera_data['email_address'])
+                    email_address = camera_data['email_address']
+                if 'phone_numbers' in camera_data:
+                    print('Phone Numbers:', camera_data['phone_numbers'])
+                    phone_numbers = camera_data['phone_numbers']
+
                 # get end time from camera detail table
                 process_endtime = self.__get_process_endtime(camera_data)
                 print('process_endtime:::', process_endtime)
 
-                print('Run detect method:', url, ' Came name:' , cam_name , ' group_name:' , group_name, ' building_name:' , building_name )
+                print('Run detect method:', url, ' Came name:' , cam_name , ' group_name:' , group_name, ' building_name:' , building_name, ' email_address:' , email_address, ' phone_numbers:' , phone_numbers )
                 d = Detective()
 
                 # Create History
@@ -193,7 +200,7 @@ class Detect_Service:
                 # Update Camera Details with status
                 Camera_Service.update_camera_status_as_running(group_name, building_name, cam_name)
                 print('DETCTIVE')
-                d.detect_process(url, process_endtime)
+                d.detect_process(url, process_endtime,group_name,cam_name,building_name,email_address,phone_numbers)
                 print('Break Done')
                 Camera_Service.update_camera_history(group_name, building_name, cam_name)
                 print('All Done')
