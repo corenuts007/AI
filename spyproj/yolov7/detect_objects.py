@@ -21,7 +21,7 @@ from spyproj.repository.alertdetails_repository import AlertDetails
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import os.path
-from spyproj.yolov7.utils.googleDriveUpload import googleDriveUpload
+from spyproj.utils.googleDriveUpload import googleDriveUpload
 class Detective():
     
     def detect(self):
@@ -143,7 +143,7 @@ class Detective():
                 print("current_time===============================>",currentTime)
                 print("previousTime===============================>",previousTime)
                 print("diff===============================>",diff.minutes)
-                if(diff.minutes>6):
+                if(diff.minutes>0):
                     imgName1=currentTime.strftime("%H_%M")+p.name
                     isReadyToUpload=True
                     img3=previousTime.strftime("%H_%M")+p.name+'.webm'
