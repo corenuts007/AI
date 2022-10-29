@@ -89,26 +89,26 @@ class Alert_Service:
                     video_location = alert_data['video_location']
                 # Add the video attachment
                 #googleDriveUpload
-                print("Uploading video into google Drive. video_location :"+ video_location)
-                gdriveLink = googleDriveUpload()
-                gLink=gdriveLink.upload(video_location,"video_name1")
+                #print("Uploading video into google Drive. video_location :"+ video_location)
+                #gdriveLink = googleDriveUpload()
+                #gLink=gdriveLink.upload(video_location,"video_name1")
             
                 #update Google drive url into alert table
-                alert_data['status']='gLink'
+                #alert_data['status']='gLink'
 
                 # Write Logic to send whatapp, email message to customer
-                #gmail = Gmail()
+                gmail = Gmail()
                 params = {
                     "to": email_address,
                     "sender": "rajkamal.spyproject@gmail.com",
                     "subject": "Alert(2) - " + camera_location + " Suspicious Activity",
                     "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.",
                     "msg_plain": " ",
-                    #"attachments": [video_location],
+                    "attachments": [video_location],
                     "signature": True  # use my account signature
                 }
-                #message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
-                #print("mail...",message)
+                message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
+                print("upload mail...",message)
                 # Update Alert table with notification status as 'Sent'
                 self.__update_alert_notification_status(alert_data)
             print('Method Exit: Alert_Service - alert_notification_process')

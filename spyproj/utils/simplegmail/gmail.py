@@ -61,15 +61,15 @@ class Gmail(object):
 
     def __init__(
         self,
-        client_secret_file: str = 'client_secret.json',
-        creds_file: str = 'token.json',
+        client_secret_file: str = 'client_secret_gmail.json',
+        creds_file: str = 'token_gmail.json',
         _creds: Optional[client.OAuth2Credentials] = None
     ) -> None:
         self.client_secret_file = client_secret_file
         self.creds_file = creds_file
 
         try:
-            # The file token.json stores the user's access and refresh
+            # The file token_gmail.json stores the user's access and refresh
             # tokens, and is created automatically when the authorization flow
             # completes for the first time.
             print("GMAIL  GMAIL  GMAIL")
@@ -95,7 +95,7 @@ class Gmail(object):
 
         except InvalidClientSecretsError:
             raise FileNotFoundError(
-                "Your 'client_secret.json' file is nonexistent. Make sure "
+                "Your 'client_secret_gmail.json' file is nonexistent. Make sure "
                 "the file is in the root directory of your application. If "
                 "you don't have a client secrets file, go to https://"
                 "developers.google.com/gmail/api/quickstart/python, and "

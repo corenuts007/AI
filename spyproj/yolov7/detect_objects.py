@@ -270,7 +270,7 @@ class Detective():
             alertData['alert_time'] = datetime.now()
             #save_path=save_path.replace("\\","abcd")
             alertData['video_location'] = save_path+'.webm'
-            alertName =alertData['alert_name']=alertData['org_name']+alertData['camera_name']+alertData['camera_location']+ alertData['video_locaion']+'.webm' 
+            alertName =alertData['alert_name']=alertData['org_name']+alertData['camera_name']+alertData['camera_location']+ alertData['video_location'] 
             alertData['alert_name']=alertName
             alertData['status']='inprogress'
             alertData['email_address']=email_address
