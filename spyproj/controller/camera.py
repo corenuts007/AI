@@ -3,8 +3,6 @@ from spyproj import app
 from spyproj.repository.cameradetails_repository import CameraDetails
 from spyproj.model.camera_details_data import CameraDetailsData
 from flask import jsonify
-import spyproj.yolov7.detect as detect
-
 
 @app.route('/cameras', methods=['GET'])
 def cameras():
@@ -45,7 +43,6 @@ def cameras():
                     'cameraname': cameraname
                 }
                 cameras.append(dataDict)
-                detect()
             # convert into json
             # json_data = json.dumps(xyz, default = str)
             json_data = jsonify(cameras)
