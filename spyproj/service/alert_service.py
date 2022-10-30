@@ -11,11 +11,14 @@ from spyproj.utils.simplegmail.gmail import Gmail
 class Alert_Service:
     def alert_message_process(self):
         try:
+            
             # find method returns cursor object
             print('Method entry: Alert_Service - alert_message_process')
-            alertcursor = AlertDetails.find_alert_details_by_filterCondition({'status':'inprogress', 'message_status':'not send'})
+            alertcursor = AlertDetails.find_alert_details_by_filterCondition({'message_status':'not send'})
             alertlist = list(alertcursor)
             print('No of records in ALERT message:', len(alertlist))
+            if(len(alertlist)>0):
+                gmail = Gmail()
             for alert_data in alertlist:
                 if 'group_name' in alert_data:
                     print('group_name:', alert_data['group_name'])
@@ -36,7 +39,7 @@ class Alert_Service:
 
 
                 # Write Logic to send whatapp, email message to customer
-                gmail = Gmail()
+                
                 params = {
                     "to": email_address,
                     "sender": "rajkamal.spyproject@gmail.com",
@@ -54,7 +57,7 @@ class Alert_Service:
             return
  
         except Exception as ex:
-            print("*Exception*", ex)
+            print("*Exception* in alert_message_process", ex)
             print(ex.__str__())
 
 
@@ -62,10 +65,11 @@ class Alert_Service:
         print('Method Entry: Alert_Service - alert_notification_process')
         try:
             # find method returns cursor object
-            
             alertcursor = AlertDetails.find_alert_details_by_filterCondition({'status':'ready','notification_link_status':'not send'})
             alertlist = list(alertcursor)
             print('No of records in ALERT Notification:', len(alertlist))
+            if(len(alertlist)>0):
+                gmail = Gmail()
             for alert_data in alertlist:
                 if 'group_name' in alert_data:
                     print('group_name:', alert_data['group_name'])
@@ -97,7 +101,6 @@ class Alert_Service:
                 #alert_data['status']='gLink'
 
                 # Write Logic to send whatapp, email message to customer
-                gmail = Gmail()
                 params = {
                     "to": email_address,
                     "sender": "rajkamal.spyproject@gmail.com",
@@ -108,14 +111,15 @@ class Alert_Service:
                     "signature": True  # use my account signature
                 }
                 message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
-                print("upload mail...",message)
+                print("**********upload mail...",message)
                 # Update Alert table with notification status as 'Sent'
                 self.__update_alert_notification_status(alert_data)
             print('Method Exit: Alert_Service - alert_notification_process')
             return
  
         except Exception as ex:
-            print("*Exception*", ex)
+            print("*Exception* in alert_notification_process", ex)
+            print("13 13 13")
             print(ex.__str__())
 
 
@@ -136,13 +140,12 @@ class Alert_Service:
             print('Method Exit: Alert_Service - __update_alert_message_status')
             return
         except Exception as ex:
-            print("*Exception*", ex)
+            print("*Exception* in __update_alert_message_status", ex)
             print(ex.__str__())
 
     def __update_alert_notification_status(self, alert_data):
         try:
             print('Method Entry: Alert_Service - __update_alert_notification_status')
-
             alert_data['notification_link_status'] = 'sent'
             #print('Update:', update_data)
             #print('ID-------ccc------:', update_data['_id'])
@@ -154,6 +157,6 @@ class Alert_Service:
             print('Method Exit: Alert_Service - __update_alert_notification_status')
             return
         except Exception as ex:
-            print("*Exception*", ex)
+            print("*Exception in __update_alert_notification_status", ex)
             print(ex.__str__())
 
