@@ -3,8 +3,6 @@ from spyproj import app
 from spyproj.repository.alertdetails_repository import AlertDetails
 from spyproj.model.alert_details_data import AlertDetailsData
 from flask import jsonify
-import spyproj.yolov7.detect as detect
-
 
 @app.route('/alerts', methods=['GET'])
 def alerts():
