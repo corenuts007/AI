@@ -146,7 +146,7 @@ class Detective():
                 if(diff.minutes>1):
                     imgName1=currentTime.strftime("%H_%M")+p.name
                     isReadyToUpload=True
-                    img3=previousTime.strftime("%H_%M")+p.name+'.webm'
+                    img3=previousTime.strftime("%H_%M")+p.name+'.mp4'
                     #print('1',img3)
                     previousVideoPath=str(save_dir / img3)
                     #print('2',previousVideoPath)
@@ -225,9 +225,9 @@ class Detective():
                                         h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                                     else:  # stream
                                         fps, w, h = 30, im0.shape[1], im0.shape[0]
-                                        save_path += '.webm'
+                                        save_path += '.mp4'
                                     vid_writer = cv2.VideoWriter(
-                                        save_path, cv2.VideoWriter_fourcc(*'vp80'), fps, (w, h))
+                                        save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
                                 vid_writer.write(im0)
                                 print("isReadyToUpload===>",isReadyToUpload)
                                 print("uploadVideo===>",uploadVideo)
@@ -269,7 +269,7 @@ class Detective():
             alertData['camera_location'] = building_name
             alertData['alert_time'] = datetime.now()
             #save_path=save_path.replace("\\","abcd")
-            alertData['video_location'] = save_path+'.webm'
+            alertData['video_location'] = save_path+'.mp4'
             alertName =alertData['alert_name']=alertData['org_name']+alertData['camera_name']+alertData['camera_location']+ alertData['video_location'] 
             alertData['alert_name']=alertName
             alertData['status']='inprogress'

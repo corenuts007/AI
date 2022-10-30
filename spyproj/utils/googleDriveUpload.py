@@ -41,7 +41,7 @@ class googleDriveUpload:
             #media = MediaFileUpload('C:/Users/server/Desktop/yoylo7/runs/detect/exp2/12_580.mp4',
             #mimetype='video/mp4')
             print("*************ggg====>",video)
-            media = MediaFileUpload(video, mimetype='video/webm')
+            media = MediaFileUpload(video, mimetype='video/mp4')
             print("*************1111111====>",video)
             file = service.files().create(body=file_metadata,
                                     media_body=media,
