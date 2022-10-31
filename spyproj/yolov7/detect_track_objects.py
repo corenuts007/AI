@@ -27,23 +27,20 @@ from spyproj.utils.googleDriveUpload import googleDriveUpload
 
 class DetectiveAndTrack():
     """Function to Draw Bounding boxes"""
-    def draw_boxes(img, bbox, identities=None, categories=None, confidences = None, names=None, colors = None):
+    def draw_boxes(self,img, bbox, identities=None, categories=None, confidences = None, names=None, colors = None):
         for i, box in enumerate(bbox):
             x1, y1, x2, y2 = [int(i) for i in box]
-            tl = opt.thickness or round(0.002 * (img.shape[0] + img.shape[1]) / 2) + 1  # line/font thickness
-            
-            previousTime=currentTime = datetime.now()
-            
+            tl = self.opt.thickness or round(0.002 * (img.shape[0] + img.shape[1]) / 2) + 1  # line/font thickness
             cat = int(categories[i]) if categories is not None else 0
             id = int(identities[i]) if identities is not None else 0
             # conf = confidences[i] if confidences is not None else 0
 
             color = colors[cat]
             
-            if not opt.nobbox:
+            if not self.opt.nobbox:
                 cv2.rectangle(img, (x1, y1), (x2, y2), color, tl)
 
-            if not opt.nolabel:
+            if not self.opt.nolabel:
                 label = str(id) + ":"+ names[cat] if identities is not None else  f'{names[cat]} {confidences[i]:.2f}'
                 tf = max(tl - 1, 1)  # font thickness
                 t_size = cv2.getTextSize(label, 0, fontScale=tl / 3, thickness=tf)[0]
@@ -55,9 +52,9 @@ class DetectiveAndTrack():
         return img
 
 
-    def detect(save_img=False):
-        source, weights, view_img, save_txt, imgsz, trace = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size, not opt.no_trace
-        save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
+    def detect(self):
+        source, weights, view_img, save_txt, imgsz, trace = self.opt.source, self.opt.weights, self.opt.view_img, self.opt.save_txt, self.opt.img_size, not self.opt.no_trace
+        save_img = not self.opt.nosave and not source.endswith('.txt')  # save inference images
         webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
             ('rtsp://', 'rtmp://', 'http://', 'https://'))
             
@@ -68,13 +65,13 @@ class DetectiveAndTrack():
         previousTime=currentTime = datetime.now()
         uploadVideo =False
 
-        save_dir = Path(increment_path(Path(opt.project) / opt.name, exist_ok=opt.exist_ok))  # increment run
-        if not opt.nosave:  
+        save_dir = Path(increment_path(Path(self.opt.project) / self.opt.name, exist_ok=self.opt.exist_ok))  # increment run
+        if not self.opt.nosave:  
             (save_dir / 'labels' if save_txt else save_dir).mkdir(parents=True, exist_ok=True)  # make dir
 
         # Initialize
         set_logging()
-        device = select_device(opt.device)
+        device = select_device(self.opt.device)
         half = device.type != 'cpu'  # half precision only supported on CUDA
 
 
@@ -84,7 +81,7 @@ class DetectiveAndTrack():
         imgsz = check_img_size(imgsz, s=stride)  # check img_size
 
         if trace:
-            model = TracedModel(model, device, opt.img_size)
+            model = TracedModel(model, device, self.opt.img_size)
 
         if half:
             model.half()  # to FP16
@@ -118,7 +115,9 @@ class DetectiveAndTrack():
         ###################################
         startTime = 0
         ###################################
+        countValue = 0
         for path, img, im0s, vid_cap in dataset:
+            countValue = countValue + 1
             img = torch.from_numpy(img).to(device)
             img = img.half() if half else img.float()  # uint8 to fp16/32
             img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -131,15 +130,15 @@ class DetectiveAndTrack():
                 old_img_h = img.shape[2]
                 old_img_w = img.shape[3]
                 for i in range(3):
-                    model(img, augment=opt.augment)[0]
+                    model(img, augment=self.opt.augment)[0]
 
             # Inference
             t1 = time_synchronized()
-            pred = model(img, augment=opt.augment)[0]
+            pred = model(img, augment=self.opt.augment)[0]
             t2 = time_synchronized()
 
             # Apply NMS
-            pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres, classes=opt.classes, agnostic=opt.agnostic_nms)
+            pred = non_max_suppression(pred, self.opt.conf_thres, self.opt.iou_thres, classes=self.opt.classes, agnostic=self.opt.agnostic_nms)
             t3 = time_synchronized()
 
             # Apply Classifier
@@ -207,9 +206,9 @@ class DetectiveAndTrack():
                                     np.array([x1, y1, x2, y2, conf, detclass])))
 
 
-                    if opt.track:
+                    if self.opt.track:
     
-                        tracked_dets = sort_tracker.update(dets_to_sort, opt.unique_track_color)
+                        tracked_dets = sort_tracker.update(dets_to_sort, self.opt.unique_track_color)
                         tracks =sort_tracker.getTrackers()
 
                         # draw boxes for visualization
@@ -219,17 +218,17 @@ class DetectiveAndTrack():
                             categories = tracked_dets[:, 4]
                             confidences = None
 
-                            if opt.show_track:
+                            if self.opt.show_track:
                                 #loop over tracks
                                 for t, track in enumerate(tracks):
                     
-                                    track_color = colors[int(track.detclass)] if not opt.unique_track_color else sort_tracker.color_list[t]
+                                    track_color = colors[int(track.detclass)] if not self.opt.unique_track_color else sort_tracker.color_list[t]
 
                                     [cv2.line(im0, (int(track.centroidarr[i][0]),
                                                     int(track.centroidarr[i][1])), 
                                                     (int(track.centroidarr[i+1][0]),
                                                     int(track.centroidarr[i+1][1])),
-                                                    track_color, thickness=opt.thickness) 
+                                                    track_color, thickness=self.opt.thickness) 
                                                     for i,_ in  enumerate(track.centroidarr) 
                                                         if i < len(track.centroidarr)-1 ] 
                     else:
@@ -238,7 +237,7 @@ class DetectiveAndTrack():
                         categories = dets_to_sort[:, 5]
                         confidences = dets_to_sort[:, 4]
                     
-                    im0 = draw_boxes(im0, bbox_xyxy, identities, categories, confidences, names, colors)
+                    im0 = self.draw_boxes(im0, bbox_xyxy, identities, categories, confidences, names, colors)
 
                     
                         
@@ -249,7 +248,7 @@ class DetectiveAndTrack():
 
                 # Stream results
                 ######################################################
-                if dataset.mode != 'image' and opt.show_fps:
+                if dataset.mode != 'image' and self.opt.show_fps:
                     currentTime = time.time()
 
                     fps = 1/(currentTime - startTime)
@@ -346,8 +345,8 @@ class DetectiveAndTrack():
             AlertDetails.update_alert({'alert_name': alertName}, alertData)
         print('Alert Update DB completed')                   
 
-
-    if __name__ == '__main__':
+    def __init__(self):
+        print('detect obj')
         parser = argparse.ArgumentParser()
         parser.add_argument('--weights', nargs='+', type=str, default='yolov7.pt', help='model.pt path(s)')
         parser.add_argument('--source', type=str, default='inference/images', help='source')  # file/folder, 0 for webcam
@@ -377,10 +376,10 @@ class DetectiveAndTrack():
         parser.add_argument('--nolabel', action='store_true', help='don`t show label')
         parser.add_argument('--unique-track-color', action='store_true', help='show each track in unique color')
 
+        self.opt = parser.parse_args()
+        print('self.opt', self.opt)
 
-        opt = parser.parse_args()
-        print(opt)
-        np.random.seed(opt.seed)
+        np.random.seed(self.opt.seed)
 
         sort_tracker = Sort(max_age=5,
                         min_hits=2,
@@ -389,16 +388,16 @@ class DetectiveAndTrack():
         #check_requirements(exclude=('pycocotools', 'thop'))
 
         #with torch.no_grad():
-        #    if opt.update:  # update all models (to fix SourceChangeWarning)
-        #        for opt.weights in ['yolov7.pt']:
+        #    if self.opt.update:  # update all models (to fix SourceChangeWarning)
+        #        for self.opt.weights in ['yolov7.pt']:
         #            detect()
-        #            strip_optimizer(opt.weights)
+        #            strip_optimizer(self.opt.weights)
         #    else:
         #        detect()
 
     def detect_process(self, url, process_endtime,group_name,cam_name,building_name,email_address,phone_numbers):
         print('***********detect_track_object_method')
-        #for self.self.opt.weights in ['yolov7.pt']:
+        #for self.opt.weights in ['yolov7.pt']:
         self.opt.weights = 'spyproj\yolov7\yolov7.pt'
         self.opt.img_size = 640
         #self.opt.source = 'https://www.youtube.com/watch?v=BTFWu21-arc'
