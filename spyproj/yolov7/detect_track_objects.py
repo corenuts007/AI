@@ -17,8 +17,7 @@ from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized, TracedModel
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from sort import *
-
+from spyproj.yolov7.sort import *
 from dateutil.relativedelta import relativedelta
 from spyproj.repository.alertdetails_repository import AlertDetails
 from pydrive.auth import GoogleAuth
