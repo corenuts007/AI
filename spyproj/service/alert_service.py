@@ -104,16 +104,17 @@ class Alert_Service:
                 params = {
                     "to": email_address,
                     "sender": "rajkamal.spyproject@gmail.com",
-                    "subject": "Alert(2) - " + camera_location + " Suspicious Activity",
-                    "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.",
-                    "msg_plain": " ",
-                    "attachments": [video_location],
+                    "subject": "Alert(3) - " + camera_location + " Suspicious Activity",
+                    "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.kk <video width='320' height='240' controls> <source src="+gLink+" type='video/webm'></video> jjj "+ gLink,
                     "signature": True  # use my account signature
                 }
+
+
+
                 message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
                 print("^^^^^^^^^^^^^^^^^^^^^^^^^^^Success upoad and mail...",message)
                 # Update Alert table with notification status as 'Sent'
-                self.__update_alert_notification_status(alert_data)
+                #self.__update_alert_notification_status(alert_data)
             print('Method Exit: Alert_Service - alert_notification_process')
             return
  
