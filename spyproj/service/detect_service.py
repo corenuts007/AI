@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from spyproj import app
-from spyproj.yolov7.detect_track_objects import DetectiveAndTrack
+from spyproj.yolov7.detect_objects import Detective
 from spyproj.service.camera_service import Camera_Service
 
 class Detect_Service:
@@ -193,7 +193,7 @@ class Detect_Service:
                 print('process_endtime:::', process_endtime)
 
                 print('Run detect method:', url, ' Came name:' , cam_name , ' group_name:' , group_name, ' building_name:' , building_name, ' email_address:' , email_address, ' phone_numbers:' , phone_numbers )
-                d = DetectiveAndTrack()
+                d = Detective()
 
                 # Create History
                 Camera_Service.create_camera_history(group_name, building_name, cam_name)
