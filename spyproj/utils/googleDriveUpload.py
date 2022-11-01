@@ -12,9 +12,10 @@ from datetime import datetime
 # If modifying these scopes, delete the file token_gdrive.json.
 #SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
 #SCOPES = ['https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable']
-SCOPES = ['https://www.googleapis.com/auth/gmail.modify',
+SCOPES = [
+        'https://www.googleapis.com/auth/drive.file',
+        'https://www.googleapis.com/auth/gmail.modify',
         'https://www.googleapis.com/auth/gmail.settings.basic',
-        'https://www.googleapis.com/auth/drive'
 ]
 
 class googleDriveUpload:
@@ -26,23 +27,25 @@ class googleDriveUpload:
         try:
             #service = build('drive', 'v3', credentials=creds)
             print("google drive auth Started")
-            service=self.aut()
+            #service=self.aut()
             print("google drive auth completed")
             currentDay = datetime.today().date()
              #createRemoteFolder
             parentID= self.createRemoteFolder(str(currentDay))
             #imgName += '.mp4'
             file_metadata = {'name': imgName, 
-            'parents': [parentID],
-             'type': 'anyone',
-	                            'value': 'anyone',
-	                            'role': 'reader'
+            'parents': [parentID]
+            #,
+            # 'type': 'anyone',
+	         #                   'value': 'anyone',
+	          #                  'role': 'reader'
             }
             #media = MediaFileUpload('C:/Users/server/Desktop/yoylo7/runs/detect/exp2/12_580.mp4',
             #mimetype='video/mp4')
             print("*************ggg====>",video)
             media = MediaFileUpload(video, mimetype='video/mp4')
             print("*************1111111====>",video)
+            service=self.aut()
             file = service.files().create(body=file_metadata,
                                     media_body=media,
                                     fields='id,webViewLink').execute()
@@ -83,6 +86,7 @@ class googleDriveUpload:
 
         try:
             service = build('drive', 'v3', credentials=creds)
+            print("AUTH COOOOOOOOOMpleted")
         except HttpError as error:
             # TODO(developer) - Handle errors from drive API.
             print(f'An error occurred: {error}')
@@ -90,6 +94,7 @@ class googleDriveUpload:
 
     def createRemoteFolder(self, folderName, parentID = None):
         service=self.aut()
+        print("======>in create folder")
         folderlist=service.files().list(q="mimeType='application/vnd.google-apps.folder'",
                                           spaces='drive',
                                           fields='nextPageToken, files(id, name)',

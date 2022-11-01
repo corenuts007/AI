@@ -94,11 +94,11 @@ class Alert_Service:
                 # Add the video attachment
                 #googleDriveUpload
                 #print("Uploading video into google Drive. video_location :"+ video_location)
-                #gdriveLink = googleDriveUpload()
-                #gLink=gdriveLink.upload(video_location,"video_name1")
+                gdriveLink = googleDriveUpload()
+                gLink=gdriveLink.upload(video_location,"video_name1")
             
                 #update Google drive url into alert table
-                #alert_data['status']='gLink'
+                alert_data['status']='gLink'
 
                 # Write Logic to send whatapp, email message to customer
                 params = {
@@ -111,7 +111,7 @@ class Alert_Service:
                     "signature": True  # use my account signature
                 }
                 message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
-                print("**********upload mail...",message)
+                print("^^^^^^^^^^^^^^^^^^^^^^^^^^^Success upoad and mail...",message)
                 # Update Alert table with notification status as 'Sent'
                 self.__update_alert_notification_status(alert_data)
             print('Method Exit: Alert_Service - alert_notification_process')
