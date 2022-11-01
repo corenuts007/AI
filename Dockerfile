@@ -6,6 +6,10 @@ ENV PYTHONUNBUFFERED True
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
+
+RUN apt-get update
+RUN apt install -y libgl1-mesa-glx
+
 COPY . ./
 
 RUN pip3 install -r requirements.txt
