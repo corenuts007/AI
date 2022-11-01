@@ -114,7 +114,7 @@ class Alert_Service:
                 message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
                 print("^^^^^^^^^^^^^^^^^^^^^^^^^^^Success upoad and mail...",message)
                 # Update Alert table with notification status as 'Sent'
-                #self.__update_alert_notification_status(alert_data)
+                self.__update_alert_notification_status(alert_data)
             print('Method Exit: Alert_Service - alert_notification_process')
             return
  
