@@ -30,8 +30,9 @@ class googleDriveUpload:
             #service=self.aut()
             print("google drive auth completed")
             currentDay = datetime.today().date()
+            videoId= self.createRemoteFolder('videos')
              #createRemoteFolder
-            parentID= self.createRemoteFolder(str(currentDay))
+            parentID= self.createRemoteFolder(str(currentDay),videoId)
             #imgName += '.mp4'
             file_metadata = {'name': imgName, 
             'parents': [parentID]
