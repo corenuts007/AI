@@ -3,9 +3,11 @@ from spyproj import app
 from spyproj.repository.alertdetails_repository import AlertDetails
 from spyproj.model.alert_details_data import AlertDetailsData
 from flask import jsonify
+from loguru import logger
 
 @app.route('/alerts', methods=['GET'])
 def alerts():
+    logger.debug("In Alert.py - alerts - start")
     try:
         # find method returns cursor object
         alertcursor = AlertDetails.get_alerts()
@@ -47,8 +49,8 @@ def alerts():
             # convert into json
             # json_data = json.dumps(xyz, default = str)
             json_data = jsonify(alerts)
-            print("search==", alerts)
             # return Response(response="suceess", status=200, mimetype="application/json")
+            logger.debug("In Alert.py - alerts - end")
             return json_data
         else:
             return "Hello No Data"
