@@ -4,6 +4,7 @@ from spyproj import app
 from flask import Flask
 from flask_apscheduler import APScheduler
 from spyproj.scheduler.schedulejobs import Schedule_jobs
+from loguru import logger
 
 scheduler = APScheduler()
 
@@ -30,8 +31,17 @@ def schedulerTaskForAlertNotification():
 
 port = os.getenv('VCAP_APP_PORT', '5000')
 if __name__ == '__main__':
-    #app.run(debug=True)
-    print('scheduler task')
+    
+    logger.add(
+        'logs/myapp.log',
+        level='DEBUG',
+        format='{time} {level} {message}',
+        backtrace=True,
+        rotation='5 MB',
+        retention=9
+    )
+    logger.debug("Logger started in run.py")
+    print('scheduler task for Detected started')
     # Scheduled the trigger as per requirement. This is place to run the schedular automatically once service is up
     #scheduler.add_job(id='Schedule Task', func= schedulerTaskForDetect, trigger = 'cron', hour = '*', minute = '00,10,20,30,40,55')
     
