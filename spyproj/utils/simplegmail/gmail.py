@@ -92,11 +92,13 @@ class Gmail(object):
 
                 flow.redirect_uri = 'http://localhost:5001/'
                 self.creds = flow.run_local_server(port=5001)
+            with open('spyproj/token_gdrive.json', 'w') as token:
+                token.write(self.creds.to_json())
 
 
                 #flags = tools.argparser.parse_args([])
                 #self.creds = tools.run_flow(flow, store, flags)
-                self._service = build('gmail', 'v3', credentials=self.creds)
+            self._service = build('gmail', 'v3', credentials=self.creds)
             
 
         except InvalidClientSecretsError:
