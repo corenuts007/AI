@@ -99,7 +99,7 @@ class Gmail(object):
 
                 creds = flow.run_local_server(port=5001)
             # Save the credentials for the next run
-            with open('token_gdrive.json', 'w') as token:
+        with open('token_gdrive.json', 'w') as token:
                 token.write(creds.to_json())
 
         try:
