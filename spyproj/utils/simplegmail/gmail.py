@@ -72,13 +72,14 @@ class Gmail(object):
             # The file token_gmail.json stores the user's access and refresh
             # tokens, and is created automatically when the authorization flow
             # completes for the first time.
-            print("GMAIL  GMAIL  GMAIL")
+            print("GMAIL  GMAIL  GMAIL", os.path)
             if _creds:
                 self.creds = _creds
             else:
                 store = file.Storage(self.creds_file)
                 self.creds = store.get()
 
+            print("GMAIL  GMAIL  _creds", os.path)
             if not self.creds or self.creds.invalid:
 
                 # Will ask you to authenticate an account in your browser.

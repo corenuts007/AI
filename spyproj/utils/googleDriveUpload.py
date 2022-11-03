@@ -21,6 +21,7 @@ SCOPES = [
 class googleDriveUpload:
 
     def __init__(self):
+        print("======>in __init__", os.path)
         print('in googleDriveUpload ****googleDriveUpload****************')
 
     def upload(self,video, imgName):
@@ -94,6 +95,7 @@ class googleDriveUpload:
         return service
 
     def createRemoteFolder(self, folderName, parentID = None):
+        print("======>in createRemoteFolder", os.path)
         service=self.aut()
         print("======>in create folder")
         folderlist=service.files().list(q="mimeType='application/vnd.google-apps.folder'",
