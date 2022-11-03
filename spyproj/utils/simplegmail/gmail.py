@@ -55,13 +55,7 @@ class Gmail(object):
 
     """
 
-    # Allow Gmail to read and write emails, and access settings like aliases.
-    _SCOPES = [
-        'https://www.googleapis.com/auth/drive.file',
-        'https://www.googleapis.com/auth/gmail.modify',
-        'https://www.googleapis.com/auth/gmail.settings.basic',
-]
-
+    
 
     # If you don't have a client secret file, follow the instructions at:
     # https://developers.google.com/gmail/api/quickstart/python
@@ -80,6 +74,13 @@ class Gmail(object):
         # The file spyproj/token_gdrive.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
+        # Allow Gmail to read and write emails, and access settings like aliases.
+        SCOPES = [
+            'https://www.googleapis.com/auth/drive.file',
+            'https://www.googleapis.com/auth/gmail.modify',
+            'https://www.googleapis.com/auth/gmail.settings.basic',
+        ]
+
         print("token exists?========>",os.path.exists('spyproj/token_gdrive.json'))
         if os.path.exists('spyproj/token_gdrive.json'):
             creds = Credentials.from_authorized_user_file('spyproj/token_gdrive.json', SCOPES)
