@@ -81,9 +81,9 @@ class Gmail(object):
             'https://www.googleapis.com/auth/gmail.settings.basic',
         ]
 
-        print("token exists?========>",os.path.exists('spyproj/token_gdrive.json'))
-        if os.path.exists('spyproj/token_gdrive.json'):
-            creds = Credentials.from_authorized_user_file('spyproj/token_gdrive.json', SCOPES)
+        print("token exists?========>",os.path.exists('token_gdrive.json'))
+        if os.path.exists('token_gdrive.json'):
+            creds = Credentials.from_authorized_user_file('token_gdrive.json', SCOPES)
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
             print("cred not valied 1t if")
@@ -93,13 +93,13 @@ class Gmail(object):
             else:
                 print("cred not expired")
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    'spyproj/client_secret_gdrive.json', SCOPES)
+                    'client_secret_gdrive.json', SCOPES)
                 #print("else 1111111111111111")
                 flow.redirect_uri = 'http://localhost:5001/'
 
                 creds = flow.run_local_server(port=5001)
             # Save the credentials for the next run
-            with open('spyproj/token_gdrive.json', 'w') as token:
+            with open('token_gdrive.json', 'w') as token:
                 token.write(creds.to_json())
 
         try:
