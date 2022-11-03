@@ -89,13 +89,15 @@ class Gmail(object):
                 #)
                 flow = InstalledAppFlow.from_client_secrets_file(
                     'spyproj/client_secret_gdrive.json', self._SCOPES)
-                flags = tools.argparser.parse_args([])
-                self.creds = tools.run_flow(flow, store, flags)
 
-            self._service = build(
-                'gmail', 'v1', http=self.creds.authorize(Http()),
-                cache_discovery=False
-            )
+                flow.redirect_uri = 'http://localhost:5001/'
+                self.creds = flow.run_local_server(port=5001)
+
+
+                #flags = tools.argparser.parse_args([])
+                #self.creds = tools.run_flow(flow, store, flags)
+                self._service = build('gmail', 'v3', credentials=self.creds)
+            
 
         except InvalidClientSecretsError:
             raise FileNotFoundError(
