@@ -98,6 +98,7 @@ class Gmail(object):
                 flow.redirect_uri = 'http://localhost:5001/'
 
                 creds = flow.run_local_server(port=5001)
+                print(creds.to_json())
             # Save the credentials for the next run
         with open('token_gdrive.json', 'w') as token:
                 token.write(creds.to_json())
