@@ -42,7 +42,7 @@ class Alert_Service:
                 
                 params = {
                     "to": email_address,
-                    "sender": "rajkamal.spyproject@gmail.com",
+                    "sender": "kamal.corenuts@gmail.com",
                     "subject": "Alert - " + camera_location + " Suspicious Activity",
                     "msg_html": "<h1>We Identified   Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.",
                     "msg_plain": " ",
@@ -103,7 +103,7 @@ class Alert_Service:
                 # Write Logic to send whatapp, email message to customer
                 params = {
                     "to": email_address,
-                    "sender": "rajkamal.spyproject@gmail.com",
+                    "sender": "kamal.corenuts@gmail.com",
                     "subject": "Alert(3) - " + camera_location + " Suspicious Activity",
                     "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.kk <video width='320' height='240' controls> <source src="+gLink+" type='video/webm'></video> jjj "+ gLink,
                     "signature": True  # use my account signature

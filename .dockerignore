@@ -2,3 +2,7 @@ Dockerfile
 README.md
 info.txt
 __pycache__
+openh264-1.6.0-win64msvc.dll
+openh264-1.8.0-win64.dll
+traced_model.pt
+yolov7.pt
