@@ -14,7 +14,7 @@ class Schedule_jobs:
         print('Method Entry: Schedule_jobs - alert_message_scheduler_task')
         alert = Alert_Service()
         alert.alert_message_process()
-        print('Method Exit: Schedule_jobs - alert_message_scheduler_task')
+        print('Method Exit: Schedule_jobs - alert_message_scheduler_task ')
         return
 
     def alert_notification_scheduler_task():
