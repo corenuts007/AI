@@ -3,6 +3,7 @@ from spyproj.controller import historyroute
 from spyproj.controller import userroute
 from spyproj.controller import detectroute
 from spyproj.controller import alert
+from spyproj.controller import gauth
 from flask import Flask
 
 app = Flask(__name__)

@@ -28,6 +28,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 from datetime import datetime
+import flask
+from spyproj import app
 
 from bs4 import BeautifulSoup
 import dateutil.parser as parser
@@ -80,32 +82,15 @@ class Gmail(object):
             'https://www.googleapis.com/auth/gmail.modify',
             'https://www.googleapis.com/auth/gmail.settings.basic',
         ]
-
-        print("token exists?========>",os.path.exists('token_gdrive.json'))
-        if os.path.exists('token_gdrive.json'):
-            creds = Credentials.from_authorized_user_file('token_gdrive.json', SCOPES)
-        # If there are no (valid) credentials available, let the user log in.
-        if not creds or not creds.valid:
-            print("cred not valied 1t if")
-            if creds and creds.expired and creds.refresh_token:
-                print("going to refresh (cred expired) 2nd if")
-                creds.refresh(Request())
-            else:
-                print("cred not expired")
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    'client_secret_gdrive.json', SCOPES)
-                #print("else 1111111111111111")
-                flow.redirect_uri = 'http://34.87.21.17:5001/'
-                print("abcddd 1111111111111111")    
-                creds = flow.run_local_server(port=5001)
-                print(creds.to_json())
-            # Save the credentials for the next run
-        with open('token_gdrive.json', 'w') as token:
-                token.write(creds.to_json())
-
         try:
-            self._service  = build('drive', 'v3', credentials=creds)
-            print("AUTH COOOOOOOOOMpleted")
+            print('startttfff')
+            with app.app_context():
+                print(app.config["ENV"])
+                print(app.config['credentials'])
+                creds = app.config['credentials']
+                self.creds=creds
+                self._service  = build('gmail', 'v1', credentials=creds)
+                print("AUTH COOOOOOOOOMpleted")
         except HttpError as error:
             # TODO(developer) - Handle errors from drive API.
             print(f'An error occurred: {error}')
@@ -114,8 +99,8 @@ class Gmail(object):
     def service(self) -> 'googleapiclient.discovery.Resource':
         # Since the token is only used through calls to the service object,
         # this ensure that the token is always refreshed before use.
-        if self.creds.access_token_expired:
-            self.creds.refresh(Http())
+        #if self.creds.access_token_expired:
+            #self.creds.refresh(Http())
 
         return self._service
 
