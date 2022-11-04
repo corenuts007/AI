@@ -95,7 +95,7 @@ class Gmail(object):
                 flow = InstalledAppFlow.from_client_secrets_file(
                     'client_secret_gdrive.json', SCOPES)
                 #print("else 1111111111111111")
-                flow.redirect_uri = 'http://localhost:5001/'
+                flow.redirect_uri = 'http://34.87.21.17:5001/'
 
                 creds = flow.run_local_server(port=5001)
                 print(creds.to_json())
