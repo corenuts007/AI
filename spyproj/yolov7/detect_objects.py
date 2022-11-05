@@ -337,7 +337,7 @@ class Detective():
     def detect_process(self, url, process_endtime,group_name,cam_name,building_name,email_address,phone_numbers):
         print('detect_object_method')
         #for self.self.opt.weights in ['yolov7.pt']:
-        self.opt.weights = 'spyproj\yolov7\yolov7.pt'
+        self.opt.weights = 'spyproj/yolov7/yolov7.pt'
         self.opt.img_size = 640
         #self.opt.source = 'https://www.youtube.com/watch?v=BTFWu21-arc'
         #self.opt.source = '0'
