@@ -48,11 +48,11 @@ class Alert_Service:
                     "msg_plain": " ",
                     "signature": True  # use my account signature
                 }
-                message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
-                print("mail...",message)
+                #message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
+                #print("mail...",message)
 
                 # Update Alert table with Message status as 'Sent'
-                self.__update_alert_message_status(alert_data)
+                #self.__update_alert_message_status(alert_data)
             print('Method Exit: Alert_Service - alert_message_process')
             return
  
@@ -68,8 +68,8 @@ class Alert_Service:
             alertcursor = AlertDetails.find_alert_details_by_filterCondition({'status':'ready','notification_link_status':'not send'})
             alertlist = list(alertcursor)
             print('No of records in ALERT Notification:', len(alertlist))
-            if(len(alertlist)>0):
-                gmail = Gmail()
+            #if(len(alertlist)>0):
+            #    gmail = Gmail()
             for alert_data in alertlist:
                 if 'group_name' in alert_data:
                     print('group_name:', alert_data['group_name'])
@@ -111,10 +111,10 @@ class Alert_Service:
 
 
 
-                message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
-                print("^^^^^^^^^^^^^^^^^^^^^^^^^^^Success upoad and mail...",message)
-                # Update Alert table with notification status as 'Sent'
-                self.__update_alert_notification_status(alert_data)
+               #  message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
+               # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^Success upoad and mail...",message)
+               # Update Alert table with notification status as 'Sent'
+               # self.__update_alert_notification_status(alert_data)
             print('Method Exit: Alert_Service - alert_notification_process')
             return
  
