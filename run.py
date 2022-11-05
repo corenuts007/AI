@@ -46,10 +46,10 @@ if __name__ == '__main__':
     #scheduler.add_job(id='Schedule Task', func= schedulerTaskForDetect, trigger = 'cron', hour = '*', minute = '00,10,20,30,40,55')
     
     # Trigger Defect service for every 10 mins (Cam service run based on configuration from Camera Detail table)
-    #scheduler.add_job(id='Schedule Task For Detect', func= schedulerTaskForDetect, trigger = 'cron', hour = '*', minute = '*/1')
+    scheduler.add_job(id='Schedule Task For Detect', func= schedulerTaskForDetect, trigger = 'cron', hour = '*', minute = '*/1')
     
     # Trigger Alert Message service for every 2 mins (Send email, whatapp message to Customer from Alert Detail table)
-    scheduler.add_job(id='Schedule Task For Alert Message', func= schedulerTaskForAlertMessage, trigger = 'cron', hour = '*', minute = '*/1')
+    #scheduler.add_job(id='Schedule Task For Alert Message', func= schedulerTaskForAlertMessage, trigger = 'cron', hour = '*', minute = '*/1')
     
     # Trigger Alert Notification service for every 5 mins(Send vedio links via email/whatapp to Customer from Alert Detail table)
     #scheduler.add_job(id='Schedule Task For Alert Notification', func= schedulerTaskForAlertNotification, trigger = 'cron', hour = '*', minute = '*/1')
