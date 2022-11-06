@@ -31,6 +31,8 @@ from datetime import datetime
 import flask
 from spyproj import app
 
+from flask import Flask, redirect, request, render_template
+
 from bs4 import BeautifulSoup
 import dateutil.parser as parser
 from googleapiclient.discovery import build
@@ -43,7 +45,7 @@ from spyproj.utils.simplegmail.query import Query
 from spyproj.utils.simplegmail.label import Label
 from spyproj.utils.simplegmail.attachment import Attachment
 from spyproj.utils.simplegmail.message import Message
-
+import requests
 class Gmail(object):
     """
     The Gmail class which serves as the entrypoint for the Gmail service API.
@@ -83,15 +85,21 @@ class Gmail(object):
             'https://www.googleapis.com/auth/gmail.settings.basic',
         ]
         try:
-            print('startttfff')
-            with app.app_context():
-                print(app.config["ENV"])
+            print('start in gmail auth11')
+            with app.app_context(), app.test_request_context():
+                #print(app.config["ENV"])
+                print("start  google auth method in gmail.py")
+                #redirect("test")
+                flask.redirect(flask.url_for('test'))
+                #flask.redirect('test_api_request')
+                print("end google auth method")
+
                 print(app.config['credentials'])
                 creds = app.config['credentials']
                 self.creds=creds
                 self._service  = build('gmail', 'v1', credentials=creds)
-                print("AUTH COOOOOOOOOMpleted")
-        except HttpError as error:
+                print("gmail AUTH COOOOOOOOOMpleted")
+        except Exception as error:
             # TODO(developer) - Handle errors from drive API.
             print(f'An error occurred: {error}')
 

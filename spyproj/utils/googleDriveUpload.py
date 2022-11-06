@@ -8,6 +8,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 from datetime import datetime
+from spyproj import app
 
 # If modifying these scopes, delete the file spyproj/token_gdrive.json.
 #SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
@@ -65,30 +66,20 @@ class googleDriveUpload:
         # The file spyproj/token_gdrive.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        print("token exists?========>",os.path.exists('spyproj/token_gdrive.json'))
-        if os.path.exists('spyproj/token_gdrive.json'):
-            creds = Credentials.from_authorized_user_file('spyproj/token_gdrive.json', SCOPES)
-        # If there are no (valid) credentials available, let the user log in.
-        if not creds or not creds.valid:
-            print("cred not valied 1t if")
-            if creds and creds.expired and creds.refresh_token:
-                print("going to refresh (cred expired) 2nd if")
-                creds.refresh(Request())
-            else:
-                print("cred not expired")
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    'spyproj/client_secret_gdrive.json', SCOPES)
-                #print("else 1111111111111111")
-                flow.redirect_uri = 'http://localhost:5001/'
-
-                creds = flow.run_local_server(port=5001)
-            # Save the credentials for the next run
-            with open('spyproj/token_gdrive.json', 'w') as token:
-                token.write(creds.to_json())
-
+        # Allow Gmail to read and write emails, and access settings like aliases.
+        SCOPES = [
+            'https://www.googleapis.com/auth/drive.file',
+            'https://www.googleapis.com/auth/gmail.modify',
+            'https://www.googleapis.com/auth/gmail.settings.basic',
+        ]
         try:
-            service = build('drive', 'v3', credentials=creds)
-            print("AUTH COOOOOOOOOMpleted")
+            print('start in gDrive auth11')
+            with app.app_context():
+                #print(app.config["ENV"])
+                print(app.config['credentials'])
+                creds = app.config['credentials']
+                service = build('drive', 'v3', credentials=creds)
+                print("Gdrive AUTH COOOOOOOOOMpleted")
         except HttpError as error:
             # TODO(developer) - Handle errors from drive API.
             print(f'An error occurred: {error}')

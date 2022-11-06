@@ -257,9 +257,9 @@ class Detective():
             print('countValue:', countValue)
             # FIXME, have to remove the countValue condition
             if(datetime.now() >= process_endtime or countValue > 100):
-                print('Path name:', p)
-                print('P name:', p.name)
-                cv2.destroyWindow(str(p))
+                #print('Path name:', p)
+                #print('P name:', p.name)
+                #cv2.destroyWindow(str(p))
                 break
             else:
                 print('Still condition not satisfy')
