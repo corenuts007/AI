@@ -54,30 +54,38 @@ class Detective():
             model = TracedModel(model, device, self.opt.img_size)
 
         if half:
+            print("start half")
             model.half()  # to FP16
-
+            print("end half")
         # Second-stage classifier
         classify = False
         if classify:
+            print("start classifer")
             modelc = load_classifier(name='resnet101', n=2)  # initialize
+            print("start 111")
             modelc.load_state_dict(torch.load(
                 'weights/resnet101.pt', map_location=device)['model']).to(device).eval()
-
+            print("end classify")
         # Set Dataloader
         vid_path, vid_writer = None, None
+        
         if webcam:
+            print("start webcam")
             view_img = check_imshow()
+            print("end chk img",view_img)
             cudnn.benchmark = True  # set True to speed up constant image size inference
             dataset = LoadStreams(source, img_size=imgsz, stride=stride)
         else:
+            print("start else part of webcam")
             dataset = LoadImages(source, img_size=imgsz, stride=stride)
 
         #print("11111111111111111111111")
 
         # Get names and colors
+        print("get names start")
         names = model.module.names if hasattr(model, 'module') else model.names
         colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
-
+        print("end get names ")
         # Run inference
         if device.type != 'cpu':
             model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(
