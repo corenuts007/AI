@@ -71,7 +71,8 @@ class Detective():
         
         if webcam:
             print("start webcam")
-            view_img = check_imshow()
+            #view_img = check_imshow()
+            view_img = False
             print("end chk img",view_img)
             cudnn.benchmark = True  # set True to speed up constant image size inference
             dataset = LoadStreams(source, img_size=imgsz, stride=stride)
