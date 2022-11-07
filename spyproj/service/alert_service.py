@@ -109,8 +109,7 @@ class Alert_Service:
                     "signature": True  # use my account signature
                 }
 
-
-
+                print("before gmaillllllllllllllllllllll")
                 message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
                 print("^^^^^^^^^^^^^^^^^^^^^^^^^^^Success upoad and mail...",message)
                 # Update Alert table with notification status as 'Sent'
