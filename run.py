@@ -62,7 +62,7 @@ if __name__ == '__main__':
     
     # Trigger Alert Notification service for every 5 mins(Send vedio links via email/whatapp to Customer from Alert Detail table)
     #scheduler.add_job(id='Schedule Task For Alert Notification', func= schedulerTaskForAlertNotification, trigger = 'cron', hour = '*', minute = '*/1')
-    scheduler.add_job(id='Schedule Task For token', func= schedulerTaskForToken, trigger = 'cron', hour = '*', minute = '*/2')
+    #scheduler.add_job(id='Schedule Task For token', func= schedulerTaskForToken, trigger = 'cron', hour = '*', minute = '*/2')
     
     scheduler.start()
     app.run(debug=False, host='0.0.0.0', port=int(port))
