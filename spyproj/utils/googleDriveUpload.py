@@ -8,7 +8,10 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 from datetime import datetime
+import flask
 from spyproj import app
+import requests
+from flask import Flask, redirect, request, render_template
 
 # If modifying these scopes, delete the file spyproj/token_gdrive.json.
 #SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
@@ -27,14 +30,12 @@ class googleDriveUpload:
 
     def upload(self,video, imgName):
         try:
+            service=self.aut()
             #service = build('drive', 'v3', credentials=creds)
-            print("google drive auth Started")
-            #service=self.aut()
-            print("google drive auth completed")
             currentDay = datetime.today().date()
-            videoId= self.createRemoteFolder('videos')
+            videoId= self.createRemoteFolder('videos', service,None)
              #createRemoteFolder
-            parentID= self.createRemoteFolder(str(currentDay),videoId)
+            parentID= self.createRemoteFolder(str(currentDay), service, videoId)
             #imgName += '.mp4'
             file_metadata = {'name': imgName, 
             'parents': [parentID]
@@ -48,7 +49,6 @@ class googleDriveUpload:
             print("*************ggg====>",video)
             media = MediaFileUpload(video, mimetype='video/mp4')
             print("*************1111111====>",video)
-            service=self.aut()
             file = service.files().create(body=file_metadata,
                                     media_body=media,
                                     fields='id,webViewLink').execute()
@@ -73,23 +73,38 @@ class googleDriveUpload:
             'https://www.googleapis.com/auth/gmail.settings.basic',
         ]
         try:
-            print('start in gDrive auth11')
-            with app.app_context():
-                #print(app.config["ENV"])
-                print(app.config['credentials'])
-                creds = app.config['credentials']
-                service = build('drive', 'v3', credentials=creds)
-                print("Gdrive AUTH COOOOOOOOOMpleted")
-        except HttpError as error:
+
+            print("token exists?========>",os.path.exists('spyproj/token_gdrive.json'))
+            if os.path.exists('spyproj/token_gdrive.json'):
+                creds = Credentials.from_authorized_user_file('spyproj/token_gdrive.json', SCOPES)
+
+            if not creds or not creds.valid:
+                print("cred not valied 1t if")
+                if creds and creds.expired and creds.refresh_token:
+                    print("going to refresh (cred expired) 2nd if")
+                    creds.refresh(Request())
+                else:
+                    print("cred not expired")
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        'spyproj/client_secret_gdrive.json', SCOPES)
+                    creds = flow.run_console()
+        
+            with open('spyproj/token_gdrive.json', 'w') as token:
+                token.write(creds.to_json())
+
+
+            #return build(API_SERVICE_NAME, API_VERSION, credentials = credentials)
+            service = build('drive', 'v3', credentials=creds)
+            print("Gdrive AUTH COOOOOOOOOMpleted")
+        except Exception as error:
             # TODO(developer) - Handle errors from drive API.
             print(f'An error occurred: {error}')
         return service
 
-    def createRemoteFolder(self, folderName, parentID = None):
-        print("======>in createRemoteFolder", os.path)
-        service=self.aut()
+    def createRemoteFolder(self, folderName,serviceName, parentID = None):
+        
         print("======>in create folder")
-        folderlist=service.files().list(q="mimeType='application/vnd.google-apps.folder'",
+        folderlist=serviceName.files().list(q="mimeType='application/vnd.google-apps.folder'",
                                           spaces='drive',
                                           fields='nextPageToken, files(id, name)',
                                           ).execute()
@@ -106,6 +121,6 @@ class googleDriveUpload:
             'mimeType': 'application/vnd.google-apps.folder',
         }
         
-        file = service.files().create(body=file_metadata,
+        file = serviceName.files().create(body=file_metadata,
                                     fields='id').execute()
         return file['id']
