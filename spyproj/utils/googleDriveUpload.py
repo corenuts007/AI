@@ -101,7 +101,7 @@ class googleDriveUpload:
             print(f'An error occurred: {error}')
         return service
 
-    def createRemoteFolder(self, folderName,serviceName, parentID = None):
+    def createRemoteFolder(self, folderName,serviceName, parentID):
         
         print("======>in create folder")
         folderlist=serviceName.files().list(q="mimeType='application/vnd.google-apps.folder'",
