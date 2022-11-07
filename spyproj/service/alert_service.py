@@ -101,11 +101,18 @@ class Alert_Service:
                 alert_data['status']='gLink'
 
                 # Write Logic to send whatapp, email message to customer
+#                params = {
+#                    "to": email_address,
+#                    "sender": "kamal.corenuts@gmail.com",
+#                    "subject": "Alert(3) - " + camera_location + " Suspicious Activity",
+#                    "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.kk <video width='320' height='240' controls> <source src="+gLink+" type='video/webm'></video> jjj "+ gLink,
+#                    "signature": True  # use my account signature
+#                }
                 params = {
                     "to": email_address,
                     "sender": "kamal.corenuts@gmail.com",
                     "subject": "Alert(3) - " + camera_location + " Suspicious Activity",
-                    "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.kk <video width='320' height='240' controls> <source src="+gLink+" type='video/webm'></video> jjj "+ gLink,
+                    "msg_html": "We Identified Suspicious Activity in "+ camera_location,
                     "signature": True  # use my account signature
                 }
 
