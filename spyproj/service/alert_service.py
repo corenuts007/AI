@@ -93,7 +93,7 @@ class Alert_Service:
                     video_location = alert_data['video_location']
                 # Add the video attachment
                 #googleDriveUpload
-                #print("Uploading video into google Drive. video_location :"+ video_location)
+                print("Uploading video into google Drive. video_location :"+ video_location)
                 gdriveLink = googleDriveUpload()
                 gLink=gdriveLink.upload(video_location,"video_name1")
             
