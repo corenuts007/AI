@@ -105,7 +105,7 @@ class Alert_Service:
                     "to": email_address,
                     "sender": "kamal.corenuts@gmail.com",
                     "subject": "Alert(3) - " + camera_location + " Suspicious Activity",
-                    "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.kk <video width='320' height='240' controls> <source src="+gLink+" type='video/webm'></video> jjj "+ gLink,
+                    "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.<video width='320' height='240' controls> <source src="+gLink+" type='video/webm'></video>"+ gLink,
                     "signature": True  # use my account signature
                 }
                 #pip install lxml
