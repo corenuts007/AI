@@ -152,7 +152,7 @@ class Detective():
                 #print("current_time===============================>",currentTime)
                 #print("previousTime===============================>",previousTime)
                 print("diff===============================>",diff.minutes)
-                if(diff.minutes>1):
+                if(diff.minutes>5):
                     imgName1=currentTime.strftime("%H_%M")+p.name
                     isReadyToUpload=True
                     img3=previousTime.strftime("%H_%M")+p.name+'.webm'
