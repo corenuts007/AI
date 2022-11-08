@@ -119,11 +119,7 @@ class googleDriveUpload:
         file_metadata = {
             'name': folderName,
             'mimeType': 'application/vnd.google-apps.folder',
-          
+            'parents': [parentID]
         }
-        child_folder = serviceName.CreateFile({'title': folderName, 'parents':[{'id':parentID}]})
-        child_folder.Upload()
-        #file = serviceName.files().create(body=file_metadata,
-        #                            fields='id').execute()
-   
-        return child_folder['id']
+        file = serviceName.files().create(body=file_metadata, fields='id').execute()
+        return file['id']
