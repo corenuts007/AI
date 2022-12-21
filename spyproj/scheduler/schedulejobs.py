@@ -31,3 +31,11 @@ class Schedule_jobs:
         gauth.test_api_request()
         print('Method Exit: Schedule_jobs - gauth_scheduler_task')
         return
+        
+    def schedulerTaskForAlertNotificationDVR():
+        print('Method Entry: Schedule_jobs - alert_notification_scheduler_task')
+        alert = Alert_Service()
+        alert.schedulerTaskForAlertNotificationDVR()
+        print('Method Exit: Schedule_jobs - alert_notification_scheduler_task')
+        return
+

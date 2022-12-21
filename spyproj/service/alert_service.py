@@ -60,7 +60,6 @@ class Alert_Service:
             print("*Exception* in alert_message_process", ex)
             print(ex.__str__())
 
-
     def alert_notification_process(self):
         print('Method Entry: Alert_Service - alert_notification_process')
         try:
@@ -93,24 +92,25 @@ class Alert_Service:
                     video_location = alert_data['video_location']
                 # Add the video attachment
                 #googleDriveUpload
-                #print("Uploading video into google Drive. video_location :"+ video_location)
-                gdriveLink = googleDriveUpload()
-                gLink=gdriveLink.upload(video_location,"video_name1")
-            
+                print("Uploading video into google Drive. video_location :"+ video_location)
+                if camera_location=='HORIZON':
+                    gLink = alert_data['url']
+                else:
+                    gdriveLink = googleDriveUpload()
+                    gLink=gdriveLink.upload(video_location,"video_name1")
                 #update Google drive url into alert table
-                alert_data['status']='gLink'
+                    alert_data['url']=gLink
 
                 # Write Logic to send whatapp, email message to customer
                 params = {
                     "to": email_address,
                     "sender": "kamal.corenuts@gmail.com",
                     "subject": "Alert(3) - " + camera_location + " Suspicious Activity",
-                    "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.kk <video width='320' height='240' controls> <source src="+gLink+" type='video/webm'></video> jjj "+ gLink,
+                    "msg_html": "<h1>We Identified Suspicious Activity in "+ camera_location + "  !</h1><br />Pls Take the Nescessary action.<video width='320' height='240' controls> <source src="+gLink+" type='video/webm'></video>"+ gLink,
                     "signature": True  # use my account signature
                 }
-
-
-
+                #pip install lxml
+                print("before gmaillllllllllllllllllllll")
                 message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
                 print("^^^^^^^^^^^^^^^^^^^^^^^^^^^Success upoad and mail...",message)
                 # Update Alert table with notification status as 'Sent'
@@ -122,8 +122,6 @@ class Alert_Service:
             print("*Exception* in alert_notification_process", ex)
             print("13 13 13")
             print(ex.__str__())
-
-
 
     def __update_alert_message_status(self, alert_data):
         try:
@@ -160,4 +158,23 @@ class Alert_Service:
         except Exception as ex:
             print("*Exception in __update_alert_notification_status", ex)
             print(ex.__str__())
+    
+    def schedulerTaskForAlertNotificationDVR(self):
+        print('Method Entry: Alert_Service - verifyAndProcess_notifications')
+        try:
+            
+            print('Method Entry: Alert_Service - 11111')
+            #insertAlertDetailsIntoDB('SBR','01','horizon','save_path','krishnar8@gmail.com','9940085336')
+
+            gdriveLink = googleDriveUpload()
+            print('Method Entry: Alert_Service - 2222')
+            gdriveLink.convertVideoAndUpload()
+ 
+            print('Method Exit: Alert_Service - alert_notification_process')
+            return
+ 
+        except Exception as ex:
+            print("exception in verifyAndProcess_notifications method", ex)
+            print(ex.__str__())
+
 
