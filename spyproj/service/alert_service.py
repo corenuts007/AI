@@ -92,12 +92,10 @@ class Alert_Service:
                     video_location = alert_data['video_location']
                 # Add the video attachment
                 #googleDriveUpload
-                print("Uploading video into google Drive. video_location :"+ video_location)
-                if camera_location=='HORIZON':
-                    gLink = alert_data['url']
-                else:
-                    gdriveLink = googleDriveUpload()
-                    gLink=gdriveLink.upload(video_location,"video_name1")
+                #print("Uploading video into google Drive. video_location :"+ video_location)
+                gdriveLink = googleDriveUpload()
+                gLink=gdriveLink.upload(video_location,"video_name1")
+            
                 #update Google drive url into alert table
                     alert_data['url']=gLink
 

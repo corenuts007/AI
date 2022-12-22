@@ -152,7 +152,7 @@ class Detective():
                 #print("current_time===============================>",currentTime)
                 #print("previousTime===============================>",previousTime)
                 print("diff===============================>",diff.minutes)
-                if(diff.minutes>3):
+                if(diff.minutes>5):
                     imgName1=currentTime.strftime("%H_%M")+p.name
                     isReadyToUpload=True
                     img3=previousTime.strftime("%H_%M")+p.name+'.webm'
@@ -256,7 +256,7 @@ class Detective():
             print('process_endtime:', process_endtime)
             print('countValue:', countValue)
             # FIXME, have to remove the countValue condition
-            if(datetime.now() >= process_endtime or countValue > 100):
+            if(datetime.now() >= process_endtime or countValue > 1000):
                 #print('Path name:', p)
                 #print('P name:', p.name)
                 #cv2.destroyWindow(str(p))

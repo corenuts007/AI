@@ -86,19 +86,26 @@ class Gmail(object):
         ]
         try:
             print('start in gmail auth11')
-            with app.app_context(), app.test_request_context():
-                #print(app.config["ENV"])
-                print("start  google auth method in gmail.py")
-                #redirect("test")
-                flask.redirect(flask.url_for('test'))
-                #flask.redirect('test_api_request')
-                print("end google auth method")
+            print("token exists?========>",os.path.exists('spyproj/token_gdrive.json'))
+            if os.path.exists('spyproj/token_gdrive.json'):
+                creds = Credentials.from_authorized_user_file('spyproj/token_gdrive.json', SCOPES)
 
-                print(app.config['credentials'])
-                creds = app.config['credentials']
-                self.creds=creds
-                self._service  = build('gmail', 'v1', credentials=creds)
-                print("gmail AUTH COOOOOOOOOMpleted")
+            if not creds or not creds.valid:
+                print("cred not valied 1t if")
+                if creds and creds.expired and creds.refresh_token:
+                    print("going to refresh (cred expired) 2nd if")
+                    creds.refresh(Request())
+                else:
+                    print("cred not expired")
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        'spyproj/client_secret_gdrive.json', SCOPES)
+                    creds = flow.run_console()
+        
+            with open('spyproj/token_gdrive.json', 'w') as token:
+                token.write(creds.to_json())
+            self.creds=creds
+            self._service  = build('gmail', 'v1', credentials=creds)
+            print("gmail AUTH COOOOOOOOOMpleted")
         except Exception as error:
             # TODO(developer) - Handle errors from drive API.
             print(f'An error occurred: {error}')
