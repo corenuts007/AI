@@ -68,8 +68,8 @@ if __name__ == '__main__':
     scheduler.add_job(id='Schedule Task For Alert Message', func= schedulerTaskForAlertMessage, trigger = 'cron', hour = '*', minute = '*/1')
     
     # Trigger Alert Notification service for every 5 mins(Send vedio links via email/whatapp to Customer from Alert Detail table)
-    #scheduler.add_job(id='Schedule Task For Alert Notification', func= schedulerTaskForAlertNotification, trigger = 'cron', hour = '*', minute = '*/1')
-    scheduler.add_job(id='Schedule Task For token', func= schedulerTaskForToken, trigger = 'cron', hour = '*', minute = '*/2')
+    scheduler.add_job(id='Schedule Task For Alert Notification', func= schedulerTaskForAlertNotification, trigger = 'cron', hour = '*', minute = '*/1')
+    #scheduler.add_job(id='Schedule Task For token', func= schedulerTaskForToken, trigger = 'cron', hour = '*', minute = '*/2')
 
     # Trigger Alert Notification service for every 5 mins(Send vedio links via email/whatapp to Customer from Alert Detail table)
     scheduler.add_job(id='Schedule Task For Verify And Process Notifications DVR', func= schedulerTaskForAlertNotificationDVR, trigger = 'cron', hour = '*', minute = '*/1')
