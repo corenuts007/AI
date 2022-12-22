@@ -11,6 +11,22 @@ from googleapiclient.http import MediaIoBaseDownload
 from datetime import datetime
 import flask
 from spyproj import app
+import requests
+from flask import Flask, redirect, request, render_template
+import os
+import ffmpeg 
+#from ffmpeg_streaming import Formats
+import io
+import shutil, sys  
+from spyproj.utils.simplegmail.gmail import Gmail
+from spyproj.repository.cameradetails_repository import CameraDetails
+from spyproj.repository.alertdetails_repository import AlertDetails
+import subprocess
+import time
+
+
+
+
 
 # If modifying these scopes, delete the file spyproj/token_gdrive.json.
 #SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
@@ -37,9 +53,13 @@ class googleDriveUpload:
             service=self.aut()
             #service = build('drive', 'v3', credentials=creds)
             currentDay = datetime.today().date()
-            videoId= self.createRemoteFolder('videos')
+            print('upload 111111111',video)
+            print('upload 111111111',imgName)
+            videoId= self.createRemoteFolder('convertedVideos', service,None)
+            #print('upload 22222')
              #createRemoteFolder
-            parentID= self.createRemoteFolder(str(currentDay),videoId)
+            parentID= self.createRemoteFolder(str(currentDay), service, videoId)
+            #print('upload 3333')
             #imgName += '.mp4'
             file_metadata = {'name': imgName, 
             'parents': [parentID]
@@ -52,8 +72,7 @@ class googleDriveUpload:
             #mimetype='video/mp4')
             #print("*************ggg====>",video)
             media = MediaFileUpload(video, mimetype='video/mp4')
-            print("*************1111111====>",video)
-            service=self.aut()
+            #print("*************1111111====>",video)
             file = service.files().create(body=file_metadata,
                                     media_body=media,
                                     fields='id,webViewLink').execute()
@@ -115,23 +134,39 @@ class googleDriveUpload:
             'https://www.googleapis.com/auth/gmail.settings.basic'
         ]
         try:
-            print('start in gDrive auth11')
-            with app.app_context():
-                #print(app.config["ENV"])
-                print(app.config['credentials'])
-                creds = app.config['credentials']
-                service = build('drive', 'v3', credentials=creds)
-                print("Gdrive AUTH COOOOOOOOOMpleted")
-        except HttpError as error:
+
+            #print("token exists?========>",os.path.exists('spyproj/token_gdrive.json'))
+            if os.path.exists('spyproj/token_gdrive.json'):
+                creds = Credentials.from_authorized_user_file('spyproj/token_gdrive.json', SCOPES)
+
+            if not creds or not creds.valid:
+                #print("cred not valied 1t if")
+                if creds and creds.expired and creds.refresh_token:
+                    #print("going to refresh (cred expired) 2nd if")
+                    creds.refresh(Request())
+                else:
+                    #print("cred not expired")
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        'spyproj/client_secret_gdrive.json', SCOPES)
+                    creds = flow.run_console()
+        
+            with open('spyproj/token_gdrive.json', 'w') as token:
+                token.write(creds.to_json())
+
+
+            #return build(API_SERVICE_NAME, API_VERSION, credentials = credentials)
+            service = build('drive', 'v3', credentials=creds)
+            #print("Gdrive AUTH COOOOOOOOOMpleted")
+        except Exception as error:
             # TODO(developer) - Handle errors from drive API.
             print(f'An error occurred: {error}')
         return service
-
-    def createRemoteFolder(self, folderName, parentID = None):
-        print("======>in createRemoteFolder", os.path)
-        service=self.aut()
-        print("======>in create folder")
-        folderlist=service.files().list(q="mimeType='application/vnd.google-apps.folder'",
+    
+    
+    def createRemoteFolder(self, folderName,serviceName, parentID):
+        
+        #print("======>in create folder1")
+        folderlist=serviceName.files().list(q="mimeType='application/vnd.google-apps.folder'",
                                           spaces='drive',
                                           fields='nextPageToken, files(id, name)',
                                           ).execute()
@@ -148,9 +183,10 @@ class googleDriveUpload:
             'mimeType': 'application/vnd.google-apps.folder',
             'parents': [parentID]
         }
-        
-        file = service.files().create(body=file_metadata,
-                                    fields='id').execute()
+        #print("======>in create folder 22", folderName)
+        #print("======>in create folder 33", parentID)
+        file = serviceName.files().create(body=file_metadata, fields='id').execute()
+        #print("======>in create folder completed")
         return file['id']
 
     def convertVideoAndUpload(self):

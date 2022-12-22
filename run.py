@@ -41,7 +41,7 @@ def schedulerTaskForToken():
     print('Method Entry: schedulerTaskForToken @', datetime.datetime.today())
     #Schedule_jobs.alert_notification_scheduler_task()
     #requests.get("http://localhost:5000/test")
-    Schedule_jobs.gauth_scheduler_task()
+    #Schedule_jobs.gauth_scheduler_task()
     print('Method Exit: schedulerTaskForToken @', datetime.datetime.today())
 
 port = os.getenv('VCAP_APP_PORT', '5000')
@@ -70,6 +70,9 @@ if __name__ == '__main__':
     # Trigger Alert Notification service for every 5 mins(Send vedio links via email/whatapp to Customer from Alert Detail table)
     #scheduler.add_job(id='Schedule Task For Alert Notification', func= schedulerTaskForAlertNotification, trigger = 'cron', hour = '*', minute = '*/1')
     scheduler.add_job(id='Schedule Task For token', func= schedulerTaskForToken, trigger = 'cron', hour = '*', minute = '*/2')
+
+    # Trigger Alert Notification service for every 5 mins(Send vedio links via email/whatapp to Customer from Alert Detail table)
+    scheduler.add_job(id='Schedule Task For Verify And Process Notifications DVR', func= schedulerTaskForAlertNotificationDVR, trigger = 'cron', hour = '*', minute = '*/1')
     
     scheduler.start()
     app.run(debug=False, host='0.0.0.0', port=int(port))
