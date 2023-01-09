@@ -11,6 +11,13 @@ class Schedule_jobs:
         print('Method Exit: Schedule_jobs - detect_scheduler_task')
         return
     
+    def detect_scheduler_tasks():
+        print('Method Entry: Sched  ule_jobs - detect_scheduler_tasks')
+        detect = Detect_Service()
+        detect.run_detect_processes()
+        print('Method Exit: Schedule_jobs - detect_scheduler_tasks')
+        return
+    
     def alert_message_scheduler_task():
         print('Method Entry: Schedule_jobs - alert_message_scheduler_task')
         alert = Alert_Service()
@@ -32,10 +39,10 @@ class Schedule_jobs:
         print('Method Exit: Schedule_jobs - gauth_scheduler_task')
         return
         
-    def schedulerTaskForAlertNotificationDVR():
-        print('Method Entry: Schedule_jobs - alert_notification_scheduler_task')
+    def schedulerTaskForProcessDVR():
+        print('Method Entry: Schedule_jobs - DVR process task')
         alert = Alert_Service()
-        alert.schedulerTaskForAlertNotificationDVR()
-        print('Method Exit: Schedule_jobs - alert_notification_scheduler_task')
+        alert.schedulerTaskForProcessDVR()
+        print('Method Exit: Schedule_jobs - DVR process task')
         return
 

@@ -74,8 +74,8 @@ class CameraDetailsData:
         if ("thursday_nextday_endtime" in data):
             finalvalue['thursday_nextday_endtime'] = data["thursday_nextday_endtime"]
 
-        if ("friday_starttime" in newdata):
-            finalvalue['friday_starttime'] = newdata["friday_starttime"]
+        if ("friday_starttime" in data):
+            finalvalue['friday_starttime'] = data["friday_starttime"]
         
         if ("friday_nextday_endtime" in data):
             finalvalue['friday_nextday_endtime'] = data["friday_nextday_endtime"]
@@ -84,7 +84,7 @@ class CameraDetailsData:
             finalvalue['saturday_starttime'] = data["saturday_starttime"]
         
         if ("saturday_nextday_endtime" in data):
-            finalvalue['saturday_nextday_endtime'] = newdata["saturday_nextday_endtime"]
+            finalvalue['saturday_nextday_endtime'] = data["saturday_nextday_endtime"]
 
         if ("sunday_starttime" in data):
             finalvalue['sunday_starttime'] = data["sunday_starttime"]
@@ -104,8 +104,10 @@ class CameraDetailsData:
         finalvalue = {}
         finalvalue['group_name'] = group_name
         finalvalue['building_name'] = building_name
-        finalvalue['cam_name'] = cam_name
-        finalvalue['run_status'] = status
+        if cam_name != '':
+            finalvalue['cam_name'] = cam_name
+        if status != '':
+            finalvalue['run_status'] = status
         print(finalvalue)
         return finalvalue
 

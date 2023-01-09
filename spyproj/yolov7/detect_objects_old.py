@@ -178,9 +178,7 @@ class Detective():
                         for c in det[:, -1].unique():
                             if(names[int(c)]=='person'):
                                 personDetected=True
-                            
-                                self.insertAlertDetailsIntoDB(self.group_name,self.cam_name,self.building_name,save_path+'.webm',self.email_address,self.phone_numbers)
-                                 
+                                self.insertAlertDetailsIntoDB(self.group_name,self.cam_name,self.building_name,save_path,self.email_address,self.phone_numbers)
                                 #print("person detected")
                 if (True):
                         # Rescale boxes from img_size to im0 size
@@ -270,152 +268,8 @@ class Detective():
             s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
             ##print(f"Results saved to {save_dir}{s}")
 
-        print(f'Done. ({time.time() - t0:.3f}s)')
-    def detectdvr(self):
-        source, weights, view_img, save_txt, imgsz, trace = self.opt.source, self.opt.weights, self.opt.view_img, self.opt.save_txt, self.opt.img_size, not self.opt.no_trace
-        save_img = not self.opt.nosave and not source.endswith(
-            '.txt')  # save inference images
-        process_endtime = self.process_endtime
-        print('DVR process_endtime:', process_endtime)
-        webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
-            ('rtsp://', 'rtmp://', 'http://', 'https://'))
-        previousTime=currentTime = datetime.now()
-        uploadVideo =False
+        #print(f'Done. ({time.time() - t0:.3f}s)')
         
-        # Directories
-        save_dir = Path(increment_path(Path(self.opt.project) / self.opt.name,
-                        exist_ok=self.opt.exist_ok))  # increment run
-        (save_dir / 'labels' if save_txt else save_dir).mkdir(parents=True,
-                                                            exist_ok=True)  # make dir
-        # Initialize
-        set_logging()
-        device = select_device(self.opt.device)
-        half = device.type != 'cpu'  # half precision only supported on CUDA
-
-        # Load model
-        model = attempt_load(weights, map_location=device)  # load FP32 model
-        stride = int(model.stride.max())  # model stride
-        imgsz = check_img_size(imgsz, s=stride)  # check img_size
-
-        if trace:
-            model = TracedModel(model, device, self.opt.img_size)
-
-        if half:
-            print("start half")
-            model.half()  # to FP16
-            print("end half")
-        # Second-stage classifier
-        classify = False
-        if classify:
-            print("start classifer")
-            modelc = load_classifier(name='resnet101', n=2)  # initialize
-            print("start 111")
-            modelc.load_state_dict(torch.load(
-                'weights/resnet101.pt', map_location=device)['model']).to(device).eval()
-            print("end classify")
-        # Set Dataloader
-        vid_path, vid_writer = None, None
-        
-        if webcam:
-            print("DVR start webcam")
-            #view_img = check_imshow()
-            view_img = False
-            print("end chk img",view_img)
-            cudnn.benchmark = True  # set True to speed up constant image size inference
-            dataset = LoadStreams(source, img_size=imgsz, stride=stride)
-        else:
-            print("DVR start else part of webcam")
-            dataset = LoadImages(source, img_size=imgsz, stride=stride)
-
-        print("11111111111111111111111::", source)
-
-        # Get names and colors
-        print("DVR get names start")
-        names = model.module.names if hasattr(model, 'module') else model.names
-        colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
-        print("DVR end get names ")
-        # Run inference
-        if device.type != 'cpu':
-            model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(
-                next(model.parameters())))  # run once
-        old_img_w = old_img_h = imgsz
-        old_img_b = 1
-
-        t0 = time.time()
-        countValue = 0
-        personDetected =False
-        for path, img, im0s, vid_cap in dataset:
-            
-            if (personDetected is True):
-                break
-
-            countValue = countValue + 1
-            img = torch.from_numpy(img).to(device)
-            img = img.half() if half else img.float()  # uint8 to fp16/32
-            img /= 255.0  # 0 - 255 to 0.0 - 1.0
-            if img.ndimension() == 3:
-                img = img.unsqueeze(0)
-
-            # Warmup
-            if device.type != 'cpu' and (old_img_b != img.shape[0] or old_img_h != img.shape[2] or old_img_w != img.shape[3]):
-                old_img_b = img.shape[0]
-                old_img_h = img.shape[2]
-                old_img_w = img.shape[3]
-                for i in range(3):
-                    model(img, augment=self.opt.augment)[0]
-
-            # Inference
-            t1 = time_synchronized()
-            pred = model(img, augment=self.opt.augment)[0]
-            t2 = time_synchronized()
-
-            # Apply NMS
-            pred = non_max_suppression(
-                pred, self.opt.conf_thres, self.opt.iou_thres, classes=self.opt.classes, agnostic=self.opt.agnostic_nms)
-            t3 = time_synchronized()
-
-            # Apply Classifier
-            if classify:
-                pred = apply_classifier(pred, modelc, img, im0s)
-
-            print("222222222222222222222::", source)
-            ##print(f"Results saved to {len(pred)}{s}")
-
-            # Process detections
-            for i, det in enumerate(pred):  # detections per image
-                if webcam:  # batch_size >= 1
-                    p, s, im0, frame = path[i], '%g: ' % i, im0s[i].copy(
-                    ), dataset.count
-                else:
-                    p, s, im0, frame = path, '', im0s, getattr(dataset, 'frame', 0)
-
-                print(f"3333333333333 33333::", source)
-                #print(f"Results saved to {len(det)}")
-                #print(f"44444444")
-                p = Path(p)  # to Path
-                isReadyToUpload = False
-                imgName1=p.name
-                save_path = str(save_dir /imgName1)  # img.jpg
-                #print("save_path===============================>",save_path)
-                txt_path = str(save_dir / 'labels' / p.stem) + \
-                    ('' if dataset.mode == 'image' else f'_{frame}')  # img.txt
-                # normalization gain whwhpreviousTime
-                gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]
-                #personDetected =False
-                if len(det):
-                        for c in det[:, -1].unique():
-                            if(names[int(c)]=='person'):
-                                personDetected=True
-                               # message_status='not send',notification_link_status='not send'
-
-                                self.insertAlertDetailsIntoDBForDVR(self.group_name,self.cam_name,self.building_name,save_path,self.email_address,self.phone_numbers,self.dvr_location_link)
-                                print("person detected")
-                                break
-        if save_txt or save_img:
-            s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
-            ##print(f"Results saved to {save_dir}{s}")
-
-        #print(f'Done. ({time.time() - t0:.3f}s)')    
     def insertAlertDetailsIntoDB(self, group_name,cam_name,building_name,save_path,email_address,phone_numbers) :
             print("person detected -- Insert cam info into db")
             alertData = {}
@@ -424,8 +278,7 @@ class Detective():
             alertData['camera_location'] = building_name
             alertData['alert_time'] = datetime.now()
             #save_path=save_path.replace("\\","abcd")
-            #alertData['video_location'] = save_path+'.webm'
-            alertData['video_location'] = save_path
+            alertData['video_location'] = save_path+'.webm'
             alertName =alertData['alert_name']=alertData['org_name']+alertData['camera_name']+alertData['camera_location']+ alertData['video_location'] 
             alertData['alert_name']=alertName
             alertData['status']='inprogress'
@@ -433,32 +286,6 @@ class Detective():
             alertData['phone_numbers']=phone_numbers
             alertData['message_status']='not send'
             alertData['notification_link_status']='not send'
-            alertcursor = AlertDetails.find_alert_details_by_filterCondition({'alert_name': alertName})
-            alertlist = list(alertcursor)
-            if len(alertlist) == 0:
-                print("insert db=",alertData )
-                AlertDetails.create_alert(alertData)
-                print('Insert DB completedddd',alertData)
-    
-    def insertAlertDetailsIntoDBForDVR(self, group_name,cam_name,building_name,save_path,email_address,phone_numbers, dvr_location_link) :
-            print("person detected -- Insert cam info into db")
-            alertData = {}
-            alertData['org_name'] = group_name
-            alertData['camera_name'] = cam_name
-            alertData['camera_location'] = building_name
-            alertData['alert_time'] = datetime.now()
-            #save_path=save_path.replace("\\","abcd")
-            #alertData['video_location'] = save_path+'.webm'
-            alertData['video_location'] = save_path
-            alertName =alertData['alert_name']=alertData['org_name']+alertData['camera_name']+alertData['camera_location']+ alertData['video_location'] 
-            alertData['alert_name']=alertName
-            alertData['status']='ready'
-            alertData['email_address']=email_address
-            alertData['phone_numbers']=phone_numbers
-            alertData['message_status']='sent'
-            alertData['notification_link_status']='not send'
-            alertData['dvr_flag']='yes'
-            alertData['url']=dvr_location_link
             alertcursor = AlertDetails.find_alert_details_by_filterCondition({'alert_name': alertName})
             alertlist = list(alertcursor)
             if len(alertlist) == 0:
@@ -516,7 +343,7 @@ class Detective():
         #     else:
         #         detect()
 
-    def detect_process(self, url, process_endtime,group_name,cam_name,building_name,email_address,phone_numbers,dvr_flag,dvr_location_link):
+    def detect_process(self, url, process_endtime,group_name,cam_name,building_name,email_address,phone_numbers):
         print('detect_object_method')
         #for self.self.opt.weights in ['yolov7.pt']:
         self.opt.weights = 'spyproj/yolov7/yolov7.pt'
@@ -532,10 +359,5 @@ class Detective():
         self.building_name = building_name
         self.email_address = email_address
         self.phone_numbers = phone_numbers
-        self.dvr_location_link = dvr_location_link
-        self.dvr_flag = dvr_flag
-        if self.dvr_flag == 'yes':
-            self.detectdvr()
-        else:
-            self.detect()
+        self.detect()
         strip_optimizer(self.opt.weights)

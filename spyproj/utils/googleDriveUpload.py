@@ -21,6 +21,8 @@ import shutil, sys
 from spyproj.utils.simplegmail.gmail import Gmail
 from spyproj.repository.cameradetails_repository import CameraDetails
 from spyproj.repository.alertdetails_repository import AlertDetails
+from spyproj.repository.cameradetails_repository import CameraDetails
+from spyproj.model.camera_details_data import CameraDetailsData
 import subprocess
 import time
 
@@ -46,7 +48,7 @@ class googleDriveUpload:
 
     def __init__(self):
         #print("======>in __init__", os.path)
-        print('')
+        print('googleDriveUpload')
 
     def upload(self,video, imgName):
         try:
@@ -135,7 +137,7 @@ class googleDriveUpload:
         ]
         try:
 
-            #print("token exists?========>",os.path.exists('spyproj/token_gdrive.json'))
+            print("token exists?========>",os.path.exists('spyproj/token_gdrive.json'))
             if os.path.exists('spyproj/token_gdrive.json'):
                 creds = Credentials.from_authorized_user_file('spyproj/token_gdrive.json', SCOPES)
 
@@ -156,7 +158,7 @@ class googleDriveUpload:
 
             #return build(API_SERVICE_NAME, API_VERSION, credentials = credentials)
             service = build('drive', 'v3', credentials=creds)
-            #print("Gdrive AUTH COOOOOOOOOMpleted")
+            print("Gdrive AUTH COOOOOOOOOMpleted")
         except Exception as error:
             # TODO(developer) - Handle errors from drive API.
             print(f'An error occurred: {error}')
@@ -191,41 +193,45 @@ class googleDriveUpload:
 
     def convertVideoAndUpload(self):
         try:
+            print('Start convert')
             drive=self.aut()
             folderlist=drive.files().list(q="mimeType='application/vnd.google-apps.folder'",
                                           spaces='drive',
                                           fields='nextPageToken, files(id, name)',
                                           ).execute()
+            print('Start convert 2')
             titlelist = folderlist.get('files', [])
+            print('Start convert 3 :', titlelist)
             for item in titlelist:
+                print('name:', item['name'])
                 if item['name']=='kamal':
-                    cameracursor = CameraDetails.find_camera_details_by_params({'building_name':'HORIZON'})
-                    cameralist = list(cameracursor)
-                    #print('No of records in camera:', len(cameralist))
-                    camera_data = cameralist[0]    
-                    url = cam_name = ''
-                    group_name = camera_data['group_name']
-                    building_name = camera_data['building_name']
-                    url = camera_data['url_or_ip_address']
-                    cam_name = camera_data['cam_name']
-                    email_address = camera_data['email_address']
-                    phone_numbers = camera_data['phone_numbers']
-                    #print("*Done---******",item['name'])
+                    # cameracursor = CameraDetails.find_camera_details_by_params({'building_name':'HORIZON'})
+                    # cameralist = list(cameracursor)
+                    # #print('No of records in camera:', len(cameralist))
+                    # camera_data = cameralist[0]    
+                    # url = cam_name = ''
+                    # group_name = camera_data['group_name']
+                    # building_name = camera_data['building_name']
+                    # url = camera_data['url_or_ip_address']
+                    # cam_name = camera_data['cam_name']
+                    # email_address = camera_data['email_address']
+                    # phone_numbers = camera_data['phone_numbers']
+                    print("*Done---******",item['name'])
                     results = drive.files().list(q = "'" + item['id'] + "' in parents", fields="nextPageToken, files(*)").execute()
                     items = results.get('files', [])
                     #dirpath = 'D:\\Gopi\\corenuts\\Camera\\AI-main'
-                    tobeInserted =True
-                    tobeUpdated =True
+                    # tobeInserted =True
+                    # tobeUpdated =True
                     for fileItem in items:
-                        #print("*Ramya11********---******",fileItem['name']  )
+                        print("*Ramya11********---******",fileItem['name']  )
                         file_id=fileItem['id']
-                        if(tobeInserted):
-                            self.insertAlertDetailsIntoDB(group_name,cam_name,building_name,fileItem['name'] ,email_address,phone_numbers)
-                            tobeInserted = False
+                        # if(tobeInserted):
+                        #     self.insertAlertDetailsIntoDB(group_name,cam_name,building_name,fileItem['name'] ,email_address,phone_numbers)
+                        #     tobeInserted = False
                         request = drive.files().get_media(fileId=file_id)
                         fh = io.BytesIO()
                         downloader = MediaIoBaseDownload(fh, request)
-                        #print("*Ramya 222********---******" )
+                        print("*Ramya 222********---******" )
                         done = False
                         while done is False:
                             status, done = downloader.next_chunk()
@@ -238,6 +244,7 @@ class googleDriveUpload:
                             shutil.copyfileobj(fh, f)
 
                         outputFile1 = os.path.join('', fileItem['name'].replace("dav", "mp4" ))
+                        print("outputFile1::", outputFile1)
                         #method 2
                         stream = ffmpeg.input(downloadedFile,f='h264')
                         stream = ffmpeg.output(stream, outputFile1 )
@@ -251,21 +258,65 @@ class googleDriveUpload:
                         print(gLink)
                         
                         self.move(file_id=file_id,destFolder="processedVideos")   
-                        if os.path.isfile(outputFile1):
-                            os.remove(outputFile1)
+                        #if os.path.isfile(outputFile1):
+                        ##    os.remove(outputFile1)
                             #print(gLink)
                         if os.path.isfile(downloadedFile):
                             os.remove(downloadedFile)
                             #print(gLink)
-                        if(tobeUpdated):
-                            self.UpdateAlertDetailsIntoDB(group_name,cam_name,building_name,fileItem['name'],gLink )
-                            tobeUpdated=False
+                        #if(tobeUpdated):
+                        #    self.UpdateAlertDetailsIntoDB(group_name,cam_name,building_name,fileItem['name'],gLink )
+                        #    tobeUpdated=False
                         #email_address='krishnar8@gmail.com;kamal.corenuts@gmail.com'
                         #camera_location= 'Horizon'
                         #self.sendEmail(gLink,email_address,camera_location)
+
+                        ## Insert record in Camera Details table
+                        self.createCameraDetailsRecord(outputFile1, gLink)
+
         except HttpError as error:
             print(f'An error occurred: {error}')
 
+    def createCameraDetailsRecord(self, outputFile1, gLink):
+        print("gLink===========>", gLink)
+        filter_value = CameraDetailsData.populate_filter('SBR','HORIZON', '', '')
+        print('--------------------------------------------------')
+        print('filter_value:', filter_value)
+            #Insert into DB
+        cameracursor = CameraDetails.find_camera_details_by_params(filter_value)
+        #cameracursor = CameraDetails.find_camera_details_by_params({'building_name':'HORIZON'})
+        cameralist = list(cameracursor)
+        #print('No of records in camera:', len(cameralist))
+        camera_data = cameralist[0]
+        newCameraDetailsData = {}
+        newCameraDetailsData['group_name'] = camera_data['group_name']
+        newCameraDetailsData['building_name'] = camera_data['building_name']
+        newCameraDetailsData['email_address'] = camera_data['email_address']
+        newCameraDetailsData['phone_numbers'] = camera_data['phone_numbers']
+        newCameraDetailsData['cam_location'] = camera_data['cam_location']
+        newCameraDetailsData['monday_starttime'] = camera_data['monday_starttime']
+        newCameraDetailsData['monday_nextday_endtime'] = camera_data['monday_nextday_endtime']
+        newCameraDetailsData['tuesday_starttime'] = camera_data['tuesday_starttime']
+        newCameraDetailsData['tuesday_nextday_endtime'] = camera_data['tuesday_nextday_endtime']
+        newCameraDetailsData['wednesday_starttime'] = camera_data['wednesday_starttime']
+        newCameraDetailsData['wednesday_nextday_endtime'] = camera_data['wednesday_nextday_endtime']
+        newCameraDetailsData['thursday_starttime'] = camera_data['thursday_starttime']
+        newCameraDetailsData['thursday_nextday_endtime'] = camera_data['thursday_nextday_endtime']
+        newCameraDetailsData['friday_starttime'] = camera_data['friday_starttime']
+        newCameraDetailsData['friday_nextday_endtime'] = camera_data['friday_nextday_endtime']
+        newCameraDetailsData['saturday_starttime'] = camera_data['saturday_starttime']
+        newCameraDetailsData['saturday_nextday_endtime'] = camera_data['saturday_nextday_endtime']
+        newCameraDetailsData['sunday_starttime'] = camera_data['sunday_starttime']
+        newCameraDetailsData['sunday_nextday_endtime'] = camera_data['sunday_nextday_endtime']
+
+        newCameraDetailsData['url_or_ip_address'] = outputFile1
+        newCameraDetailsData['cam_name'] = 'DVR_' + str(datetime.now())
+        newCameraDetailsData['run_status'] = 'not running'
+        newCameraDetailsData['dvr_flag'] = 'yes'
+        newCameraDetailsData['dvr_location_link'] = gLink
+
+        CameraDetails.create_camera(newCameraDetailsData)
+        print('Camera Details Created successfully')
 
     def UpdateAlertDetailsIntoDB(self, group_name,cam_name,building_name,save_path,gLink) :
     	

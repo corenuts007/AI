@@ -16,6 +16,13 @@ def schedulerTaskForDetect():
     Schedule_jobs.detect_scheduler_task()
     print('Method Exit: schedulerTaskForDetect @', datetime.datetime.today())
 
+def schedulerTaskForDetects():
+    dt = datetime.datetime.now()
+
+    print('Method Entry: schedulerTaskForDetects @', datetime.datetime.today())
+    Schedule_jobs.detect_scheduler_tasks()
+    print('Method Exit: schedulerTaskForDetects @', datetime.datetime.today())
+
 def schedulerTaskForAlertMessage():
     dt = datetime.datetime.now()
 
@@ -23,12 +30,12 @@ def schedulerTaskForAlertMessage():
     Schedule_jobs.alert_message_scheduler_task()
     print('Method Exit: schedulerTaskForAlertMessage @', datetime.datetime.today())
 
-def schedulerTaskForAlertNotificationDVR():
+def schedulerTaskForProcessDVR():
     dt = datetime.datetime.now()
 
-    print('Method Entry: schedulerTaskForAlertNotificationDVR @', datetime.datetime.today())
-    Schedule_jobs.schedulerTaskForAlertNotificationDVR()
-    print('Method Exit: schedulerTaskForAlertNotificationDVR @', datetime.datetime.today())
+    print('Method Entry: schedulerTaskForProcessDVR @', datetime.datetime.today())
+    Schedule_jobs.schedulerTaskForProcessDVR()
+    print('Method Exit: schedulerTaskForProcessDVR @', datetime.datetime.today())
 
 def schedulerTaskForAlertNotification():
     dt = datetime.datetime.now()
@@ -57,22 +64,25 @@ if __name__ == '__main__':
     )
     logger.debug("Logger started in run.py")
 
-    print('scheduler task for Detected started')
+    print('scheduler task for Detected started!!')
     # Scheduled the trigger as per requirement. This is place to run the schedular automatically once service is up
     #scheduler.add_job(id='Schedule Task', func= schedulerTaskForDetect, trigger = 'cron', hour = '*', minute = '00,10,20,30,40,55')
     
     # Trigger Defect service for every 10 mins (Cam service run based on configuration from Camera Detail table)
     #scheduler.add_job(id='Schedule Task For Detect', func= schedulerTaskForDetect, trigger = 'cron', hour = '*', minute = '*/5')
+    scheduler.add_job(id='Schedule Task For Detects', func= schedulerTaskForDetects, trigger = 'cron', hour = '*', minute = '*/2')
     
     # Trigger Alert Message service for every 2 mins (Send email, whatapp message to Customer from Alert Detail table)
-    scheduler.add_job(id='Schedule Task For Alert Message', func= schedulerTaskForAlertMessage, trigger = 'cron', hour = '*', minute = '*/2')
+    #scheduler.add_job(id='Schedule Task For Alert Message', func= schedulerTaskForAlertMessage, trigger = 'cron', hour = '*', minute = '*/2')
     
     # Trigger Alert Notification service for every 5 mins(Send vedio links via email/whatapp to Customer from Alert Detail table)
     scheduler.add_job(id='Schedule Task For Alert Notification', func= schedulerTaskForAlertNotification, trigger = 'cron', hour = '*', minute = '*/5')
+    
+    
     #scheduler.add_job(id='Schedule Task For token', func= schedulerTaskForToken, trigger = 'cron', hour = '*', minute = '*/2')
 
     # Trigger Alert Notification service for every 5 mins(Send vedio links via email/whatapp to Customer from Alert Detail table)
-    scheduler.add_job(id='Schedule Task For Verify And Process Notifications DVR', func= schedulerTaskForAlertNotificationDVR, trigger = 'cron', hour = '*', minute = '*/5')
+    #scheduler.add_job(id='Schedule Task For Process DVR', func= schedulerTaskForProcessDVR, trigger = 'cron', hour = '*', minute = '*/5')
     
     scheduler.start()
     app.run(debug=False, host='0.0.0.0', port=int(port))

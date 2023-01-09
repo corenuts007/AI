@@ -67,10 +67,11 @@ class Alert_Service:
             # find method returns cursor object
             alertcursor = AlertDetails.find_alert_details_by_filterCondition({'status':'ready','notification_link_status':'not send'})
             alertlist = list(alertcursor)
-            print('No of records in ALERT Notification:', len(alertlist))
+            print('No of records in ALERT Notification::', len(alertlist))
             if(len(alertlist)>0):
                 gmail = Gmail()
             for alert_data in alertlist:
+                dvr_flag = ''
                 if 'group_name' in alert_data:
                     print('group_name:', alert_data['group_name'])
                     group_name = alert_data['group_name']
@@ -91,16 +92,25 @@ class Alert_Service:
                 if 'video_location' in alert_data:
                     print('video Locaion:', alert_data['video_location'])
                     video_location = alert_data['video_location']
-                # Add the video attachment
+
+                if 'dvr_flag' in alert_data:
+                    print('dvr_flag:', alert_data['dvr_flag'])
+                    dvr_flag = alert_data['dvr_flag']
+
+                if 'url' in alert_data:
+                    print('url:', alert_data['url'])
+                    url = alert_data['url']
+                
+                
+                # Add the video attachment, if the process is NON-DVR
                 #googleDriveUpload
-                print("Uploading video into google Drive. video_location :"+ video_location)
-                if camera_location=='HORIZON':
-                    gLink = alert_data['url']
-                else:
+                print("Uploading video into google Drive. video_location: :"+ video_location)
+                if dvr_flag=='':
                     gdriveLink = googleDriveUpload()
                     gLink=gdriveLink.upload(video_location,"video_name1")
-                #update Google drive url into alert table
-                    alert_data['url']=gLink
+                    alert_data['url']=gLink  ##update Google drive url into alert table
+                else:
+                    gLink=url
 
                 # Write Logic to send whatapp, email message to customer
                 params = {
@@ -163,8 +173,8 @@ class Alert_Service:
             print(ex.__str__())
     
 
-    def schedulerTaskForAlertNotificationDVR(self):
-        print('Method Entry: Alert_Service - verifyAndProcess_notifications')
+    def schedulerTaskForProcessDVR(self):
+        print('Method Entry: Alert_Service - Process DVR')
         try:
             
             print('Method Entry: Alert_Service - 11111')
@@ -174,11 +184,11 @@ class Alert_Service:
             print('Method Entry: Alert_Service - 2222')
             gdriveLink.convertVideoAndUpload()
  
-            print('Method Exit: Alert_Service - alert_notification_process')
+            print('Method Exit: Alert_Service - Process DVR')
             return
  
         except Exception as ex:
-            print("exception in verifyAndProcess_notifications method", ex)
+            print("exception in Process DVR method: ", ex)
             print(ex.__str__())
 
 
