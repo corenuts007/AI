@@ -245,10 +245,10 @@ class Detect_Service:
                 #schedulerName.add_job(id = jobname, func=processCameras, trigger='interval', args= [camera_data], end_date =next_date)
                 #schedulerName.start()
                 
-                thread = Thread(target=self.processCameras, args=([camera_data]), daemon=True)
-                thread.start()
-                time.sleep(10)
+                #thread = Thread(target=self.processCameras, args=([camera_data]), daemon=True)
+                #thread.start()
                 
+                self.processCameras(camera_data)
                 #return
             else:
                 print('Dont run')
