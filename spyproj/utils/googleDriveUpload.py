@@ -58,10 +58,10 @@ class googleDriveUpload:
             print('upload 111111111',video)
             print('upload 111111111',imgName)
             videoId= self.createRemoteFolder('convertedVideos', service,None)
-            #print('upload 22222')
+            print('upload 22222')
              #createRemoteFolder
             parentID= self.createRemoteFolder(str(currentDay), service, videoId)
-            #print('upload 3333')
+            print('upload 3333')
             #imgName += '.mp4'
             file_metadata = {'name': imgName, 
             'parents': [parentID]
@@ -72,13 +72,13 @@ class googleDriveUpload:
             }
             #media = MediaFileUpload('C:/Users/server/Desktop/yoylo7/runs/detect/exp2/12_580.mp4',
             #mimetype='video/mp4')
-            #print("*************ggg====>",video)
+            print("*************ggg====>",video)
             media = MediaFileUpload(video, mimetype='video/mp4')
             #print("*************1111111====>",video)
             file = service.files().create(body=file_metadata,
                                     media_body=media,
                                     fields='id,webViewLink').execute()
-            #print ('File Linkkk---',file.get('webViewLink'))    
+            print ('***Upload END     *******      File Linkkk---',file.get('webViewLink'))    
 
             return file.get('webViewLink')
         except HttpError as error:
@@ -223,57 +223,58 @@ class googleDriveUpload:
                     # tobeInserted =True
                     # tobeUpdated =True
                     for fileItem in items:
-                        print("*Ramya11********---******",fileItem['name']  )
-                        file_id=fileItem['id']
-                        # if(tobeInserted):
-                        #     self.insertAlertDetailsIntoDB(group_name,cam_name,building_name,fileItem['name'] ,email_address,phone_numbers)
-                        #     tobeInserted = False
-                        request = drive.files().get_media(fileId=file_id)
-                        fh = io.BytesIO()
-                        downloader = MediaIoBaseDownload(fh, request)
-                        print("*Ramya 222********---******" )
-                        done = False
-                        while done is False:
-                            status, done = downloader.next_chunk()
-                            #print("Download %d%%." % int(status.progress() * 100))
-
-                        fh.seek(0)
-                        # Write the received data to the file
-                        downloadedFile = os.path.join('', fileItem['name'])
-                        with open(downloadedFile, 'wb') as f:
-                            shutil.copyfileobj(fh, f)
-
-                        outputFile1 = os.path.join('', fileItem['name'].replace("dav", "mp4" ))
-                        print("outputFile1::", outputFile1)
-                        #method 2
-                        stream = ffmpeg.input(downloadedFile,f='h264')
-                        stream = ffmpeg.output(stream, outputFile1 )
-                        ffmpeg.run(stream)
                         
-                        #command =  'ffmpeg.exe -f h264 -i '+ downloadedFile + ' -c copy '+ outputFile1
-                        #subprocess.run(command)
-                        time.sleep(180)
-                        gLink=self.upload(outputFile1,fileItem['name'].replace("dav", "mp4"))
-                        print("completed upload")
-                        print(gLink)
+                        #thread = Thread(target=self.processdvr, args=([fileItem,drive]), daemon=True)
+                        #thread.start()
+                        self.processdvr(fileItem,drive)
                         
-                        self.move(file_id=file_id,destFolder="processedVideos")   
-                        #if os.path.isfile(outputFile1):
-                        ##    os.remove(outputFile1)
-                            #print(gLink)
-                        if os.path.isfile(downloadedFile):
-                            os.remove(downloadedFile)
-                            #print(gLink)
-                        #if(tobeUpdated):
-                        #    self.UpdateAlertDetailsIntoDB(group_name,cam_name,building_name,fileItem['name'],gLink )
-                        #    tobeUpdated=False
-                        #email_address='krishnar8@gmail.com;kamal.corenuts@gmail.com'
-                        #camera_location= 'Horizon'
-                        #self.sendEmail(gLink,email_address,camera_location)
+        except HttpError as error:
+            print(f'An error occurred: {error}')
 
-                        ## Insert record in Camera Details table
-                        self.createCameraDetailsRecord(outputFile1, gLink)
+    def processdvr(self, fileItem,drive):
+        try:    
+            print("*********---******",fileItem['name']  )
+            file_id=fileItem['id']
+            # if(tobeInserted):
+            #     self.insertAlertDetailsIntoDB(group_name,cam_name,building_name,fileItem['name'] ,email_address,phone_numbers)
+            #     tobeInserted = False
+            request = drive.files().get_media(fileId=file_id)
+            fh = io.BytesIO()
+            downloader = MediaIoBaseDownload(fh, request)
+            print("* 222********---******" )
+            done = False
+            while done is False:
+                status, done = downloader.next_chunk()
+                #print("Download %d%%." % int(status.progress() * 100))
 
+            fh.seek(0)
+            # Write the received data to the file
+            downloadedFile = os.path.join('', fileItem['name'])
+            with open(downloadedFile, 'wb') as f:
+                shutil.copyfileobj(fh, f)
+
+            outputFile1 = os.path.join('', fileItem['name'].replace("dav", "mp4" ))
+            print("outputFile1::", outputFile1)
+            #method 2
+            stream = ffmpeg.input(downloadedFile,f='h264')
+            stream = ffmpeg.output(stream, outputFile1 )
+            ffmpeg.run(stream)
+            
+            #command =  'ffmpeg.exe -f h264 -i '+ downloadedFile + ' -c copy '+ outputFile1
+            #subprocess.run(command)
+            time.sleep(180)
+            gLink=self.upload(outputFile1,fileItem['name'].replace("dav", "mp4"))
+            print("completed upload")
+            print(gLink)
+             
+            self.move(file_id=file_id,destFolder="processedVideos")   
+            #if os.path.isfile(outputFile1):
+            ##    os.remove(outputFile1)
+                #print(gLink)
+            if os.path.isfile(downloadedFile):
+                os.remove(downloadedFile)
+                print(gLink)
+            self.createCameraDetailsRecord(outputFile1, gLink)
         except HttpError as error:
             print(f'An error occurred: {error}')
 
