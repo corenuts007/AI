@@ -71,19 +71,18 @@ if __name__ == '__main__':
     # Trigger Defect service for every 10 mins (Cam service run based on configuration from Camera Detail table)
     #scheduler.add_job(id='Schedule Task For Detect', func= schedulerTaskForDetect, trigger = 'cron', hour = '*', minute = '*/5')
     
-    scheduler.add_job(id='Schedule Task For Detects', func= schedulerTaskForDetects, trigger = 'cron', hour = '*', minute = '*/1')
+    #scheduler.add_job(id='Schedule Task For Detects', func= schedulerTaskForDetects, trigger = 'cron', hour = '*', minute = '*/1')
     
     # Trigger Alert Message service for every 2 mins (Send email, whatapp message to Customer from Alert Detail table)
-    scheduler.add_job(id='Schedule Task For Alert Message', func= schedulerTaskForAlertMessage, trigger = 'cron', hour = '*', minute = '*/1')
+    #scheduler.add_job(id='Schedule Task For Alert Message', func= schedulerTaskForAlertMessage, trigger = 'cron', hour = '*', minute = '*/1')
     
     # Trigger Alert Notification service for every 5 mins(Send vedio links via email/whatapp to Customer from Alert Detail table)
-    scheduler.add_job(id='Schedule Task For Alert Notification', func= schedulerTaskForAlertNotification, trigger = 'cron', hour = '*', minute = '*/1')
+    #scheduler.add_job(id='Schedule Task For Alert Notification', func= schedulerTaskForAlertNotification, trigger = 'cron', hour = '*', minute = '*/1')
     
     
-    #scheduler.add_job(id='Schedule Task For token', func= schedulerTaskForToken, trigger = 'cron', hour = '*', minute = '*/2')
-
+    
     # Trigger Alert Notification service for every 5 mins(Send vedio links via email/whatapp to Customer from Alert Detail table)
-    scheduler.add_job(id='Schedule Task For Process DVR', func= schedulerTaskForProcessDVR, trigger = 'cron', hour = '*', minute = '*/1')
+    #scheduler.add_job(id='Schedule Task For Process DVR', func= schedulerTaskForProcessDVR, trigger = 'cron', hour = '*', minute = '*/1')
     
     scheduler.start()
     app.run(debug=False, host='0.0.0.0', port=int(port))
